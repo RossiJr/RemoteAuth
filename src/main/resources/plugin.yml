@@ -2,3 +2,17 @@ name: RemoteAuth
 version: '${project.version}'
 main: com.rossijr.remoteauth.RemoteAuth
 api-version: '1.17'
+commands:
+  login:
+    description: Login to the server
+    usage: /<command> <password>
+  register:
+      description: Register to the server
+      usage: /<command> <password> <password>
+  rasetspawn:
+    description: Set the spawn point
+    usage: /<command>
+    permission: remoteauth.setspawn
+settings:
+  commands:
+    log: false

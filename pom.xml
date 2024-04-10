@@ -12,7 +12,7 @@
   <name>RemoteAuth</name>
 
   <properties>
-    <java.version>1.8</java.version>
+    <java.version>1.21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -23,8 +23,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <source>10</source>
+          <target>10</target>
         </configuration>
       </plugin>
       <plugin>
@@ -67,5 +67,13 @@
           <version>1.17.1-R0.1-SNAPSHOT</version>
           <scope>provided</scope>
       </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+      <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>42.7.3</version>
+      </dependency>
+
   </dependencies>
 </project>
