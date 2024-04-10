@@ -1,0 +1,4 @@
+name: RemoteAuth
+version: '${project.version}'
+main: com.rossijr.remoteauth.RemoteAuth
+api-version: '1.17'
