@@ -28,9 +28,9 @@ public class DbConfig {
         try (InputStream input = new FileInputStream(propertiesPath.toString())) {
             properties.load(input);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            properties.clear();
         } catch (Exception e) {
-            e.printStackTrace();
+            properties.clear();
         }
     }
 
@@ -59,5 +59,9 @@ public class DbConfig {
      */
     public static String getDbPassword() {
         return properties.getProperty("db.password");
+    }
+
+    public static boolean isDbConfigured() {
+        return !properties.isEmpty();
     }
 }

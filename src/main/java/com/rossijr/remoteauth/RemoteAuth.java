@@ -6,6 +6,7 @@ import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
 import com.rossijr.remoteauth.config.StartupConfig;
 import com.rossijr.remoteauth.db.DbConnection;
+import com.rossijr.remoteauth.db.config.DbConfig;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -73,12 +74,16 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        // Verify if exists the db.properties file or if is it properly configured
+        if(!DbConfig.isDbConfigured()) {
+            Bukkit.shutdown();
+            throw new RuntimeException("The db.properties file is not configured properly, or it's configured in the wrong place.");
+        }
+
         // Register the commands
         getCommand("login").setExecutor(new LoginCommand(this));
         getCommand("register").setExecutor(new RegisterCommand(this));
-        getCommand("users").setExecutor(new AdminCommands(this));
         getCommand("rasetspawn").setExecutor(new AdminCommands(this));
-        getCommand("permtest").setExecutor(new AdminCommands(this));
 
         // Initialize the active sessions map, guaranteeing that it is not null and empty
         activeSessions = new HashMap<>();
