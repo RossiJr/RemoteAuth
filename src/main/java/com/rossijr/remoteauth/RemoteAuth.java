@@ -4,6 +4,7 @@ import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.commands.AdminCommands;
 import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
+import com.rossijr.remoteauth.config.DefaultMessages;
 import com.rossijr.remoteauth.config.StartupConfig;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.db.config.DbConfig;
@@ -170,12 +171,12 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         try {
             // Check if the player is registered
             if (Auth.isUnregistered(e.getPlayer().getUniqueId(), e.getPlayer().getName(), DbConnection.connect())) {
-                e.getPlayer().sendMessage(ChatColor.RED + "You are not registered! Use /register <password> <confirmPassword>");
+                e.getPlayer().sendMessage(DefaultMessages.JOIN_REGISTER_INFO);
             } else {
-                e.getPlayer().sendMessage(ChatColor.GREEN + "To log in, use /login <password>");
+                e.getPlayer().sendMessage(DefaultMessages.JOIN_LOGIN_INFO);
             }
         } catch (Exception ex) {
-            e.getPlayer().sendMessage(ChatColor.RED + "An error happened while checking if you are registered, contact an administrator");
+            e.getPlayer().sendMessage(DefaultMessages.CRITICAL_ISREGISTERED_ERROR);
             ex.printStackTrace();
         }
     }
@@ -208,7 +209,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         if (!activeSessions.containsKey(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
-                event.getPlayer().sendMessage(ChatColor.RED + "You are not logged in!");
+                event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
                 event.setCancelled(true);
             }
         }
@@ -219,12 +220,12 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         // If the plugin is not up, cancel the player from joining
         if (!pluginUp) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "The server is not up yet, try again later");
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, DefaultMessages.SERVER_NOT_UP);
         }
 
         // If the player is already logged in, cancel the player from joining
         if (activeSessions.containsKey(event.getUniqueId())) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "You are already logged in!");
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
         }
     }
 
@@ -240,7 +241,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         if (!activeSessions.containsKey(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
-                event.getPlayer().sendMessage(ChatColor.RED + "You are not logged in!");
+                event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
                 event.setCancelled(true);
             }
         }

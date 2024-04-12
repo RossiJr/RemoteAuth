@@ -4,6 +4,7 @@ import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.authentication.dao.RegisterDAO;
 import com.rossijr.remoteauth.authentication.models.UserModel;
+import com.rossijr.remoteauth.config.DefaultMessages;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.command.Command;
@@ -42,26 +43,26 @@ public class RegisterCommand implements CommandExecutor {
                                 // Registers the user, if successful, adds the user to the active sessions
                                 if (Auth.register(player.getUniqueId(), player.getName(), password, conn)) {
                                     plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(new UserModel(player.getUniqueId(), player.getName())));
-                                    player.sendMessage(ChatColor.GREEN + "You have successfully registered");
+                                    player.sendMessage(DefaultMessages.REGISTER_SUCCESS);
                                 } else {
-                                    player.sendMessage(ChatColor.RED + "An error happened while registering, contact an administrator");
+                                    player.sendMessage(DefaultMessages.CRITICAL_REGISTER_ERROR);
                                 }
                             } else {
                                 // If the user is not allowed to register, sends the message explaining why to the player
                                 player.sendMessage(ChatColor.RED + allowedToRegister);
                             }
                         } catch (Exception e) {
-                            player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "An error happened while registering, contact an administrator");
+                            player.sendMessage(DefaultMessages.CRITICAL_REGISTER_ERROR);
                             System.out.println("RemoteAuth --/ERROR/-- Error performing user registration - class {" + RegisterDAO.class.getName() + "}");
                         }
                     } else {
-                        player.sendMessage(ChatColor.RED + "Passwords do not match!");
+                        player.sendMessage(DefaultMessages.PASSWORDS_DO_NOT_MATCH);
                     }
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Usage: /register <password> <confirmPassword>");
+                    sender.sendMessage(DefaultMessages.REGISTER_USAGE);
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "You are already logged in");
+                player.sendMessage(DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
             }
         }
         return true;

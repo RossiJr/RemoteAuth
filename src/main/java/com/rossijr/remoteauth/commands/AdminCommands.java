@@ -1,6 +1,7 @@
 package com.rossijr.remoteauth.commands;
 
 import com.rossijr.remoteauth.RemoteAuth;
+import com.rossijr.remoteauth.config.DefaultMessages;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,17 +32,17 @@ public class AdminCommands implements CommandExecutor {
                     // Check if the player has permission to use the command
                     if(commandSender.hasPermission("remoteauth.setspawn")) {
                         plugin.setSpawn(player.getLocation());
-                        player.sendMessage(ChatColor.GREEN + "Spawn set at ("
-                                + ChatColor.WHITE + player.getLocation().getBlockX() + ChatColor.GREEN + ", "
-                                + ChatColor.WHITE + player.getLocation().getBlockY() + ChatColor.GREEN + ", "
-                                + ChatColor.WHITE + player.getLocation().getBlockZ() + ChatColor.GREEN + ")");
+                        player.sendMessage(DefaultMessages.SPAWN_SET
+                                .replace("${x}", String.valueOf(player.getLocation().getBlockX()))
+                                .replace("${y}", String.valueOf(player.getLocation().getBlockY()))
+                                .replace("${z}", String.valueOf(player.getLocation().getBlockZ())));
                     } else {
-                        commandSender.sendMessage(ChatColor.RED + "You don't have permission to use this command");
+                        commandSender.sendMessage(DefaultMessages.NO_PERMISSION_TO_PERFORM_COMMAND);
                     }
                 }
                 break;
             default:
-                commandSender.sendMessage(ChatColor.RED + "Command not found!");
+                commandSender.sendMessage(DefaultMessages.COMMAND_NOT_FOUND);
                 break;
         }
         return false;

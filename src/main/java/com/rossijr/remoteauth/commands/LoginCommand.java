@@ -3,9 +3,9 @@ package com.rossijr.remoteauth.commands;
 import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.authentication.models.UserModel;
+import com.rossijr.remoteauth.config.DefaultMessages;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.models.SessionModel;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,21 +38,21 @@ public class LoginCommand implements CommandExecutor {
                         // the user will be added to the active sessions
                         if(user != null){
                             plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(user));
-                            player.sendMessage(ChatColor.GREEN + "You have successfully logged in");
+                            player.sendMessage(DefaultMessages.LOGIN_SUCCESS);
                         } else {
-                            player.sendMessage(ChatColor.RED + "Invalid username or password");
+                            player.sendMessage(DefaultMessages.INVALID_USERNAME_OR_PASSWORD);
                         }
 
                     } catch (Exception e) {
-                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "An error happened while logging in, contact an administrator");
+                        player.sendMessage(DefaultMessages.CRITICAL_LOG_IN_ERROR);
                         System.out.println("RemoteAuth --/ERROR/-- Error performing user login - class {" + Auth.class.getName() + "}");
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "You are already logged in");
+                    player.sendMessage(DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
                 }
 
             } else {
-                player.sendMessage(ChatColor.RED + "Usage: /login <username> <password>");
+                player.sendMessage(DefaultMessages.LOGIN_USAGE);
             }
         }
 
