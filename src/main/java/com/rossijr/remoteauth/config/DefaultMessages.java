@@ -17,7 +17,7 @@ public class DefaultMessages {
 
     public static final String CRITICAL_LOG_IN_ERROR = PREFIX + "§c§lA critical error occurred while logging in. Please contact an administrator.";
     public static final String CRITICAL_REGISTER_ERROR = PREFIX + "§c§lA critical error occurred while registering. Please contact an administrator.";
-    public static final String CRITICAL_ISREGISTERED_ERROR = PREFIX + "§c§lA critical error occurred while registering. Please contact an administrator.";
+    public static final String CRITICAL_ISREGISTERED_ERROR = PREFIX + "§c§lA critical error occurred while checking if registered. Please contact an administrator.";
 
     public static final String PASSWORDS_DO_NOT_MATCH = PREFIX + "§cPasswords do not match.";
 

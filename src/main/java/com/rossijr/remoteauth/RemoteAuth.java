@@ -10,7 +10,6 @@ import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.db.config.DbConfig;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,7 +45,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *     <li>[2] = z</li>
      * </ul>
      */
-    private int[] spawnCoord;
+    private int[] spawnCoordinates;
     /**
      * <p>Spawn location angles.</p>
      * <ul>
@@ -63,9 +62,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     // -----
 
     /**
-     * If the spawn is setted
+     * If the spawn is set
      */
-    private boolean spawnSetted = false;
+    private boolean spawnSet = false;
 
 
     public Map<UUID, SessionModel> getActiveSessions() {
@@ -82,28 +81,37 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         }
 
         // Register the commands
-        getCommand("login").setExecutor(new LoginCommand(this));
-        getCommand("register").setExecutor(new RegisterCommand(this));
-        getCommand("rasetspawn").setExecutor(new AdminCommands(this));
-
+        try {
+            Objects.requireNonNull(getCommand("login")).setExecutor(new LoginCommand(this));
+            Objects.requireNonNull(getCommand("register")).setExecutor(new RegisterCommand(this));
+            Objects.requireNonNull(getCommand("rasetspawn")).setExecutor(new AdminCommands(this));
+        } catch (NullPointerException e) {
+            Bukkit.shutdown();
+            throw new RuntimeException("Error initializing commands");
+        }
         // Initialize the active sessions map, guaranteeing that it is not null and empty
         activeSessions = new HashMap<>();
 
         // Load the configuration
         getConfig().options().copyDefaults();
         try {
-            // Check if the spawn is setted
-            spawnSetted = getConfig().getString("spawn.world") != null;
+            // Check if the spawn is set
+            spawnSet = getConfig().getString("spawn.world") != null;
         } catch (Exception e) {
-            spawnSetted = false;
+            spawnSet = false;
         }
 
-        // If the spawn is setted, load spawn location
-        if (spawnSetted)
-            setLocalSpawn(new Location(Bukkit.getWorld(getConfig().getString("spawn.world")), getConfig().getInt("spawn.x"),
-                    getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
-                    Float.valueOf(getConfig().getString("spawn.yaw")), Float.valueOf(getConfig().getInt("spawn.pitch"))));
-
+        // If the spawn is set, load spawn location
+        if (spawnSet) {
+            try {
+                setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.x"),
+                        getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
+                        Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
+            } catch (NullPointerException e){
+                System.out.println("Error loading spawn location from configuration file");
+                spawnSet = false;
+            }
+        }
         // Load the database driver
         StartupConfig.bdStartup("org.postgresql.Driver");
 
@@ -124,16 +132,16 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *
      * @param location The location to set as spawn
      */
-    private void setLocalSpawn(Location location) {
-        this.spawnCoord = new int[3];
+    private void setLocalSpawn(Location location) throws NullPointerException{
+        this.spawnCoordinates = new int[3];
         this.spawnAngles = new float[2];
 
-        this.spawnCoord[0] = location.getBlockX();
-        this.spawnCoord[1] = location.getBlockY();
-        this.spawnCoord[2] = location.getBlockZ();
+        this.spawnCoordinates[0] = location.getBlockX();
+        this.spawnCoordinates[1] = location.getBlockY();
+        this.spawnCoordinates[2] = location.getBlockZ();
         this.spawnAngles[1] = location.getYaw();
         this.spawnAngles[0] = location.getPitch();
-        this.spawnWorld = location.getWorld().getName();
+        this.spawnWorld = Objects.requireNonNull(location.getWorld()).getName();
     }
 
     /**
@@ -141,15 +149,20 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *
      * @param location The location to set as spawn
      */
-    private void setConfigSpawn(Location location) {
-        getConfig().options().copyDefaults();
-        getConfig().set("spawn.x", location.getBlockX());
-        getConfig().set("spawn.y", location.getBlockY());
-        getConfig().set("spawn.z", location.getBlockZ());
-        getConfig().set("spawn.yaw", location.getYaw());
-        getConfig().set("spawn.pitch", location.getPitch());
-        getConfig().set("spawn.world", location.getWorld().getName());
-        saveConfig();
+    private void setConfigSpawn(Location location) throws NullPointerException{
+        try {
+            getConfig().options().copyDefaults();
+            getConfig().set("spawn.x", location.getBlockX());
+            getConfig().set("spawn.y", location.getBlockY());
+            getConfig().set("spawn.z", location.getBlockZ());
+            getConfig().set("spawn.yaw", location.getYaw());
+            getConfig().set("spawn.pitch", location.getPitch());
+            getConfig().set("spawn.world", Objects.requireNonNull(location.getWorld()).getName());
+        } catch (NullPointerException e) {
+            System.out.println("Error setting spawn location in configuration file");
+        } finally {
+            saveConfig();
+        }
     }
 
     /**
@@ -164,9 +177,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        // If the spawn is setted, teleport the player to the spawn location
-        if (spawnSetted)
-            e.getPlayer().teleport(new Location(Bukkit.getWorld(spawnWorld), spawnCoord[0], spawnCoord[1], spawnCoord[2],
+        // If the spawn is set, teleport the player to the spawn location
+        if (spawnSet)
+            e.getPlayer().teleport(new Location(Bukkit.getWorld(spawnWorld), spawnCoordinates[0], spawnCoordinates[1], spawnCoordinates[2],
                     spawnAngles[1], spawnAngles[0]));
         try {
             // Check if the player is registered
@@ -176,15 +189,15 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
                 e.getPlayer().sendMessage(DefaultMessages.JOIN_LOGIN_INFO);
             }
         } catch (Exception ex) {
-            e.getPlayer().sendMessage(DefaultMessages.CRITICAL_ISREGISTERED_ERROR);
-            ex.printStackTrace();
+            Objects.requireNonNull(Bukkit.getPlayer(e.getPlayer().getUniqueId())).kickPlayer(DefaultMessages.CRITICAL_ISREGISTERED_ERROR);
+            System.out.println("RemoteAuth --/ERROR/-- Error checking if " + e.getPlayer().getName() + " was registered - class {" + Auth.class.getName() + "}");
         }
     }
 
     @EventHandler
     public void onPlayerMoveEvent(PlayerMoveEvent event) {
         // If the player is not logged in, cancel the event
-        if (!activeSessions.containsKey(event.getPlayer().getUniqueId())) {
+        if (!isPlayerLogged(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         }
     }
@@ -197,7 +210,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
                 || e.getAction().equals(Action.LEFT_CLICK_AIR)
                 || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
             Player player = e.getPlayer();
-            if (!activeSessions.containsKey(player.getUniqueId())) {
+            if (!isPlayerLogged(player.getUniqueId())) {
                 e.setCancelled(true);
             }
         }
@@ -206,7 +219,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     @EventHandler
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         // If the player is not logged in, cancel the event
-        if (!activeSessions.containsKey(event.getPlayer().getUniqueId())) {
+        if (!isPlayerLogged(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
                 event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
@@ -224,7 +237,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         }
 
         // If the player is already logged in, cancel the player from joining
-        if (activeSessions.containsKey(event.getUniqueId())) {
+        if (isPlayerLogged(event.getUniqueId())) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
         }
     }
@@ -238,12 +251,16 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         // If the player is not logged in, cancel the event
-        if (!activeSessions.containsKey(event.getPlayer().getUniqueId())) {
+        if (!isPlayerLogged(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
                 event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
                 event.setCancelled(true);
             }
         }
+    }
+
+    private boolean isPlayerLogged(UUID playerUUID) {
+        return activeSessions.containsKey(playerUUID);
     }
 }
