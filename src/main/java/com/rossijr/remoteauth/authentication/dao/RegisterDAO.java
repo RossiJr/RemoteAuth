@@ -70,7 +70,7 @@ public class RegisterDAO {
         var sql = "SELECT * FROM public.user WHERE uuid = ? limit 1";
         try {
             var pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, uuid.toString());
+            pstmt.setObject(1, uuid);
             var resultSet = pstmt.executeQuery();
             return resultSet.next();
         } catch (Exception e) {

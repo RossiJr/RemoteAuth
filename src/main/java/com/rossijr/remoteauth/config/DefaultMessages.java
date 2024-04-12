@@ -4,7 +4,7 @@ public class DefaultMessages {
     public static final String PREFIX = "§7[§bRemoteAuth§7] ";
 
     // Greeting messages
-    public static final String JOIN_REGISTER_INFO = PREFIX + "§aYou are not registered! Use /register <password> <confirmPassword> to register.";
+    public static final String JOIN_REGISTER_INFO = PREFIX + "§aYou are not registered!\n> §aUse /register <password> <confirmPassword> to register.";
     public static final String JOIN_LOGIN_INFO = PREFIX + "§aTo log in, use /login <password>";
 
     // Error messages
