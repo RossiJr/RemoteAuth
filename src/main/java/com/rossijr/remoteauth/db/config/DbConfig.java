@@ -2,7 +2,6 @@ package com.rossijr.remoteauth.db.config;
 
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.io.File;
@@ -19,20 +18,17 @@ public class DbConfig {
 
     static {
         // Generate the path to the db.properties file
-        StringBuilder propertiesPath = new StringBuilder();
-        propertiesPath.append(System.getProperty("user.dir"));
-        propertiesPath.append(File.separator);
-        propertiesPath.append("plugins");
-        propertiesPath.append(File.separator);
-        propertiesPath.append("RemoteAuth");
-        propertiesPath.append(File.separator);
-        propertiesPath.append("db.properties");
+        String propertiesPath = System.getProperty("user.dir") +
+                File.separator +
+                "plugins" +
+                File.separator +
+                "RemoteAuth" +
+                File.separator +
+                "db.properties";
 
         // Load the properties file into the properties object
-        try (InputStream input = new FileInputStream(propertiesPath.toString())) {
+        try (InputStream input = new FileInputStream(propertiesPath)) {
             properties.load(input);
-        } catch (FileNotFoundException e) {
-            properties.clear();
         } catch (Exception e) {
             properties.clear();
         }
