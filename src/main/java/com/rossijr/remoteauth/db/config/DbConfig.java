@@ -65,7 +65,54 @@ public class DbConfig {
         return properties.getProperty("db.password");
     }
 
+    /**
+     * Get the user schema
+     * @return User schema
+     */
+    public static String getUserSchema(){
+        String schema = properties.getProperty("db.user_schema");
+        // Return the schema if it is not null, otherwise return "public"
+        return schema != null ? schema : "public";
+    }
+
+    /**
+     * Get the user table
+     * @return User table
+     */
+    public static String getUserTable(){
+        String table = properties.getProperty("db.user_table");
+        return table != null ? table : "users";
+    }
+
+    /**
+     * Get the username column
+     * @return Username column
+     */
+    public static String getUsernameColumn(){
+        String column = properties.getProperty("db.username_column");
+        return column != null ? column : "username";
+    }
+
+    /**
+     * Get the password column
+     * @return Password column
+     */
+    public static String getPasswordColumn(){
+        String column = properties.getProperty("db.password_column");
+        return column != null ? column : "password";
+    }
+
+    /**
+     * Get the UUID column
+     * @return UUID column
+     */
+    public static String getUUIDColumn(){
+        String column = properties.getProperty("db.uuid_column");
+        return column != null ? column : "uuid";
+    }
+
     public static boolean isDbConfigured() {
         return !properties.isEmpty();
     }
+
 }

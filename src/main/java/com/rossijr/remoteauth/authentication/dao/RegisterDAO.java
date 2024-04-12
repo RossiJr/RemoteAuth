@@ -1,5 +1,7 @@
 package com.rossijr.remoteauth.authentication.dao;
 
+import com.rossijr.remoteauth.db.config.DbConfig;
+
 import java.sql.Connection;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ public class RegisterDAO {
      */
     public static boolean register(UUID uuid, String username, String password, Connection conn) {
         // Query to be performed
-        var sql = "INSERT INTO public.user (uuid, username, password) VALUES (?, ?, ?)";
+        var sql = "INSERT INTO " + DbConfig.getUserSchema() + "." + DbConfig.getUserTable() + " (uuid, username, password) VALUES (?, ?, ?)";
         try {
             // Generate the prepared statement and replace the placeholders
             // Used also to prevent SQL injection
@@ -46,7 +48,8 @@ public class RegisterDAO {
      * @return true if the username already exists, false otherwise
      */
     public static boolean usernameExists(String username, Connection conn) throws Exception {
-        var sql = "SELECT * FROM public.user WHERE username = ? limit 1";
+        var sql = "SELECT * FROM " + DbConfig.getUserSchema() + "." + DbConfig.getUserTable()
+                + " WHERE " + DbConfig.getUsernameColumn() + " = ? limit 1";
         try {
             var pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
@@ -66,7 +69,8 @@ public class RegisterDAO {
      * @throws Exception if an error occurs during the query
      */
     public static boolean uuidExists(UUID uuid, Connection conn) throws Exception {
-        var sql = "SELECT * FROM public.user WHERE uuid = ? limit 1";
+        var sql = "SELECT * FROM " + DbConfig.getUserSchema() + "." + DbConfig.getUserTable()
+                + " WHERE " + DbConfig.getUUIDColumn() + " = ? limit 1";
         try {
             var pstmt = conn.prepareStatement(sql);
             pstmt.setObject(1, uuid);

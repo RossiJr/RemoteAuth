@@ -47,17 +47,26 @@ Make sure to configure properly the database connection and the spawn point (opt
 
 #### Database Configuration
 
-To configure RemoteAuth, you need to create a file in the plugin directory `\plugins\RemoteAuth\db.properties`. This file
+To configure RemoteAuth, you need to create a file in the plugin directory `/plugins/RemoteAuth/db.properties`. This file
 should contain the following properties, as shown in the example below:
 
 ```properties
 # THOSE ARE THE DEFAULT VALUES, YOU MUST CHANGE TO YOUR OWN VALUES #
+
+# REQUIRED FIELDS
 db.dbms=postgresql
 db.host=localhost
 db.port=5432
 db.database=RemoteAuthTest
 db.username=postgres
 db.password=postgres
+
+# OPTIONAL FIELDS
+db.user_schema=public
+db.user_table=users
+db.uuid_column=uuid
+db.username_column=username
+db.password_column=password
 ```
 
 - `db.dbms` - The DBMS you are using. Use the one of the following parameters: **(REQUIRED)**
@@ -65,13 +74,15 @@ db.password=postgres
 - `db.host` - The host of the database. **(REQUIRED)**
 - `db.port` - The port used for your database. **(REQUIRED)**
 - `db.database` - The name of the database you are using. **(REQUIRED)**
-    - Currently, the queries use a default schema and user table `public.user`, the option to change those
-      configurations is not available yet, but will be added soon (if you need to use another table reference, you must
-      **manually** change the queries and then recompile the plugin).
 - `db.username` - The username used to connect to the database. **(REQUIRED)**
 - `db.password` - The password used to connect to the database. **(REQUIRED)**
+- `db.user_schema` - The schema where the user's table is located. **(OPTIONAL)**
+- `db.user_table` - The table where the user's data is stored. **(OPTIONAL)**
+- `db.uuid_column` - The column where the user's UUID is stored. **(OPTIONAL)**
+- `db.username_column` - The column where the user's username is stored. **(OPTIONAL)**
+- `db.password_column` - The column where the user's password is stored. **(OPTIONAL)**
 
-> **If the file doesn't exist or any errors have happened during the connection to the database, the plugin will shut the server down.**
+> **If the file doesn't exist or any error has happened during the connection to the database, the plugin will shut the server down.**
 
 #### Spawn Configuration
 

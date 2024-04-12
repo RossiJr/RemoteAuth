@@ -1,6 +1,7 @@
 package com.rossijr.remoteauth.authentication.dao;
 
 import com.rossijr.remoteauth.authentication.models.UserModel;
+import com.rossijr.remoteauth.db.config.DbConfig;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,7 +22,9 @@ public class LoginDAO {
      */
     public static UserModel login(String username, String password, Connection conn) {
         // Query to be performed
-        var  sql = "SELECT * FROM public.user WHERE username = ? AND password = ? limit 1";
+        var  sql = "SELECT * FROM " + DbConfig.getUserSchema() + "." + DbConfig.getUserTable()
+                + " WHERE " + DbConfig.getUsernameColumn() + " = ? AND "
+                + DbConfig.getPasswordColumn() + " = ? limit 1";
         try {
             // Generate the prepared statement and replace the placeholders
             // Used also to prevent SQL injection
