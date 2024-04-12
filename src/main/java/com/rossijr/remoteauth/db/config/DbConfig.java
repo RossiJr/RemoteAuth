@@ -22,6 +22,10 @@ public class DbConfig {
         StringBuilder propertiesPath = new StringBuilder();
         propertiesPath.append(System.getProperty("user.dir"));
         propertiesPath.append(File.separator);
+        propertiesPath.append("plugins");
+        propertiesPath.append(File.separator);
+        propertiesPath.append("RemoteAuth");
+        propertiesPath.append(File.separator);
         propertiesPath.append("db.properties");
 
         // Load the properties file into the properties object

@@ -35,7 +35,6 @@ public class RegisterDAO {
         } catch (Exception e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during register - class {" + RegisterDAO.class.getName() + "}");
             System.out.println("RemoteAuth --/ERROR/-- Query: " + sql);
-            e.printStackTrace();
         }
         return false;
     }
@@ -61,10 +60,10 @@ public class RegisterDAO {
 
     /**
      * Check if the UUID already exists in the database
-     * @param uuid
-     * @param conn
-     * @return
-     * @throws Exception
+     * @param uuid UUID to be checked
+     * @param conn opened connection to the database
+     * @return true if the UUID already exists, false otherwise
+     * @throws Exception if an error occurs during the query
      */
     public static boolean uuidExists(UUID uuid, Connection conn) throws Exception {
         var sql = "SELECT * FROM public.user WHERE uuid = ? limit 1";

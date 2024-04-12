@@ -47,7 +47,7 @@ Make sure to configure properly the database connection and the spawn point (opt
 
 #### Database Configuration
 
-To configure RemoteAuth, you need to create a file in the root file of your server named `\db.properties`. This file
+To configure RemoteAuth, you need to create a file in the plugin directory `\plugins\RemoteAuth\db.properties`. This file
 should contain the following properties, as shown in the example below:
 
 ```properties
@@ -70,6 +70,8 @@ db.password=postgres
       **manually** change the queries and then recompile the plugin).
 - `db.username` - The username used to connect to the database. **(REQUIRED)**
 - `db.password` - The password used to connect to the database. **(REQUIRED)**
+
+> **If the file doesn't exist or any errors have happened during the connection to the database, the plugin will shut the server down.**
 
 #### Spawn Configuration
 
