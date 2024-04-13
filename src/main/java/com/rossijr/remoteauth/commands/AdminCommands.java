@@ -2,7 +2,6 @@ package com.rossijr.remoteauth.commands;
 
 import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.config.DefaultMessages;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +16,7 @@ public class AdminCommands implements CommandExecutor {
     /**
      * Plugin instance
      */
-    private RemoteAuth plugin;
+    private final RemoteAuth plugin;
     public AdminCommands(RemoteAuth plugin) {
         this.plugin = plugin;
     }

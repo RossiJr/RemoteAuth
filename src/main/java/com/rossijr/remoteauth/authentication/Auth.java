@@ -15,8 +15,8 @@ import java.util.UUID;
 public class Auth {
     /**
      * Login method to authenticate the user.
-     * @param username
-     * @param password
+     * @param username username of the user
+     * @param password password of the user (NOT HASHED)
      * @param connection open connection to the database
      * @return UserModel object if the user is authenticated, null otherwise
      */
@@ -36,7 +36,7 @@ public class Auth {
      * @param username username of the user (unique identifier)
      * @param password password of the user
      * @param connection open connection to the database
-     * @return
+     * @return true if the user was successfully registered, false otherwise
      */
     public static boolean register(UUID uuid, String username, String password, Connection connection) {
         password = Utils.hashString(password);
@@ -79,7 +79,7 @@ public class Auth {
     }
 
     /**
-     * Check if the user is allowed to register
+     * Check if the user is allowed to register, in this case if the username is unique
      * @param username username to be checked
      * @param connection open connection to the database
      * @return null if the user is allowed to register, a message explaining why the user is not allowed to register otherwise
@@ -92,7 +92,7 @@ public class Auth {
     }
 
     /**
-     * Check if the user is unregistered
+     * Check if the user is unregistered, checking if the username and UUID are unique
      * @param uuid UUID of the user
      * @param username username of the user
      * @param connection open connection to the database
