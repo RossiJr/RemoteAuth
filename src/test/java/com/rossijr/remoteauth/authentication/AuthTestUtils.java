@@ -33,13 +33,15 @@ public class AuthTestUtils {
             var SQL2_1 = "DROP TABLE IF EXISTS users CASCADE";
             var SQL2 = "CREATE TABLE IF NOT EXISTS users (uuid UUID PRIMARY KEY UNIQUE, username VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL)";
             var SQL3 = "INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)";
+            logger.info("Executing the queries");
             connection.prepareStatement(SQL1).executeUpdate();
             connection.prepareStatement(SQL2_1).executeUpdate();
             connection.prepareStatement(SQL2).executeUpdate();
             var pstmt = connection.prepareStatement(SQL3);
-            pstmt.setObject(1, userModel.getUuid());
-            pstmt.setObject(2, userModel.getUsername());
-            pstmt.setObject(3, userModel.getPassword());
+            pstmt.setString(1, userModel.getUuid().toString());
+            pstmt.setString(2, userModel.getUsername());
+            pstmt.setString(3, userModel.getPassword());
+            logger.info("Query: " + pstmt);
             pstmt.executeUpdate();
             logger.info("Schema and user table created");
         } catch (Exception e) {
@@ -47,4 +49,5 @@ public class AuthTestUtils {
             e.printStackTrace();
         }
     }
+
 }

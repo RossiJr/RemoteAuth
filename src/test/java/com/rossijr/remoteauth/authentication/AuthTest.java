@@ -25,11 +25,11 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, Utils.hashString(password)));
 
-            logger.info("Performing the login");
             // Perform the login
             assertNotNull(Auth.login(username, password, connection));
+            logger.info("Valid credentials login test successful");
 
         } catch (Exception e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during connection - class {" + AuthTest.class.getName() + "}");
@@ -48,11 +48,12 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, Utils.hashString(password)));
 
             logger.info("Performing the login");
             // Perform the login
             assertNull(Auth.login(username, "wrongPassword", connection));
+            logger.info("Invalid credentials login test successful");
 
         } catch (Exception e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during connection - class {" + AuthTest.class.getName() + "}");
@@ -71,11 +72,11 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, Utils.hashString(password)));
 
-            logger.info("Performing the register");
             // Perform the register
             assertTrue(Auth.register(java.util.UUID.randomUUID(), "newUser", "newPassword", connection));
+            logger.info("Valid credentials register test successful");
 
         } catch (Exception e) {
             logger.severe("Error during connection");
@@ -94,7 +95,7 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, Utils.hashString(password)));
 
             logger.info("Performing the register");
             // Perform the register
@@ -103,6 +104,7 @@ public class AuthTest {
             UUID randomUUID = UUID.randomUUID();
             assertTrue(Auth.register(randomUUID, "newUser", "newPassword", connection));
             assertFalse(Auth.register(randomUUID, "newUser", "newPassword", connection));
+            logger.info("Invalid credentials register test successful");
 
         } catch (Exception e) {
             logger.severe("Error during connection");
@@ -122,7 +124,7 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(randomUUID, username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(randomUUID, username, Utils.hashString(password)));
 
             logger.info("Performing the isUnregistered");
             // Perform the isUnregistered
@@ -130,6 +132,7 @@ public class AuthTest {
             assertFalse(Auth.isUnregistered(randomUUID, "newUser", connection));
             assertFalse(Auth.isUnregistered(UUID.randomUUID(), username, connection));
             assertTrue(Auth.isUnregistered(UUID.randomUUID(), "newUser", connection));
+            logger.info("isUnregistered test successful");
 
         } catch (Exception e) {
             logger.severe("Error during connection");
@@ -148,12 +151,13 @@ public class AuthTest {
         try {
             logger.info("Initializing connection to the database and creating the user table");
             Connection connection = AuthTestUtils.mockConnection();
-            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, password));
+            AuthTestUtils.databaseInitiation(connection, new UserModel(UUID.randomUUID(), username, Utils.hashString(password)));
 
             logger.info("Performing the isAllowedToRegister");
             // Perform the isAllowedToRegister
             assertEquals("Username already exists", Auth.allowedToRegister(username, connection));
             assertNull(Auth.allowedToRegister("newUser", connection));
+            logger.info("allowedToRegister test successful");
 
         } catch (Exception e) {
             logger.severe("Error during connection");
