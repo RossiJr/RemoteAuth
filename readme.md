@@ -107,7 +107,7 @@ db.password_column=password
 > - **In case of no optional fields set, the plugin will use the default values (the ones shown in the example above).**
 > - **If the file doesn't exist or any error has happened during the connection to the database, the plugin will shut the server down.**
 
-#### Spawn Configuration {#spawn-configuration}
+#### Spawn Configuration <a name="spawn-configuration"></a>
 
 The spawn point is used to teleport the player when they log in. If the spawn point is not set, the player won't be teleported.
 
@@ -117,7 +117,7 @@ want to use it, you can skip this step.
 > **If you don't want the player being teleported when logging in, you must make sure the `spawn` object in
 the `/plugin/RemoteAuth/config.yml` file is empty.**
 
-##### 1. First option - With command (**RECOMMENDED**) {#db-config-first-option}
+##### 1. First option - With command (**RECOMMENDED**) <a name="db-config-first-option"></a>
 
 - To configure the spawn point you must use the `/rasetspawn` command
 - This command will set the spawn point to the location where the command was executed.
@@ -125,7 +125,7 @@ the `/plugin/RemoteAuth/config.yml` file is empty.**
     - set the direction the player is looking with the `pitch` for the vertical direction and `yaw` for the horizontal
       direction
 
-##### 2. Second option - Manually {#db-config-second-option}
+##### 2. Second option - Manually <a name="db-config-second-option"></a>
 
 - You can set the spawn point manually in the `config.yml` file inside `/plugins/RemoteAuth` folder.
 - There will be a section called `spawn` where you can set the `X`, `Y`, `Z`, `pitch`, `yaw` and `world` values.
