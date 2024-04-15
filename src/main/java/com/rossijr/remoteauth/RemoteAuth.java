@@ -4,8 +4,11 @@ import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.commands.AdminCommands;
 import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
-import com.rossijr.remoteauth.config.DefaultMessages;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
+import com.rossijr.remoteauth.config.Settings;
 import com.rossijr.remoteauth.config.StartupConfig;
+import com.rossijr.remoteauth.config.messages.ParameterBuilder;
+import com.rossijr.remoteauth.config.messages.Parameters;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.db.config.DbConfig;
 import com.rossijr.remoteauth.models.SessionModel;
@@ -184,12 +187,16 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         try {
             // Check if the player is registered
             if (Auth.isUnregistered(e.getPlayer().getUniqueId(), e.getPlayer().getName(), DbConnection.connect())) {
-                e.getPlayer().sendMessage(DefaultMessages.JOIN_REGISTER_INFO);
+                e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.WELCOME_REGISTER, ParameterBuilder.create()
+                        .addParameter(Parameters.PLAYER, e.getPlayer().getName())
+                        .build()));
             } else {
-                e.getPlayer().sendMessage(DefaultMessages.JOIN_LOGIN_INFO);
+                e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.WELCOME_LOGIN, ParameterBuilder.create()
+                        .addParameter(Parameters.PLAYER, e.getPlayer().getName())
+                        .build()));
             }
         } catch (Exception ex) {
-            Objects.requireNonNull(Bukkit.getPlayer(e.getPlayer().getUniqueId())).kickPlayer(DefaultMessages.CRITICAL_ISREGISTERED_ERROR);
+            Objects.requireNonNull(Bukkit.getPlayer(e.getPlayer().getUniqueId())).kickPlayer(Settings.getMessage(DefaultMessages.CRITICAL_ISREGISTERED_ERROR));
             System.out.println("RemoteAuth --/ERROR/-- Error checking if " + e.getPlayer().getName() + " was registered - class {" + Auth.class.getName() + "}");
         }
     }
@@ -222,7 +229,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         if (!isPlayerLogged(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
-                event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
+                event.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.ERROR_NOT_LOGGED_IN));
                 event.setCancelled(true);
             }
         }
@@ -233,12 +240,12 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         // If the plugin is not up, cancel the player from joining
         if (!pluginUp) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, DefaultMessages.SERVER_NOT_UP);
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Settings.getMessage(DefaultMessages.ERROR_SERVER_NOT_UP));
         }
 
         // If the player is already logged in, cancel the player from joining
         if (isPlayerLogged(event.getUniqueId())) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Settings.getMessage(DefaultMessages.ERROR_ALREADY_LOGGED_IN));
         }
     }
 
@@ -254,7 +261,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         if (!isPlayerLogged(event.getPlayer().getUniqueId())) {
             String[] message = event.getMessage().split(" ");
             if (!(message[0].equals("/login") || message[0].equals("/register"))) {
-                event.getPlayer().sendMessage(DefaultMessages.PLAYER_NOT_LOGGED_IN);
+                event.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.ERROR_NOT_LOGGED_IN));
                 event.setCancelled(true);
             }
         }

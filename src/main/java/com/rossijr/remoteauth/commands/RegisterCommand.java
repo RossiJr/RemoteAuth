@@ -4,7 +4,8 @@ import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.authentication.dao.RegisterDAO;
 import com.rossijr.remoteauth.authentication.models.UserModel;
-import com.rossijr.remoteauth.config.DefaultMessages;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
+import com.rossijr.remoteauth.config.Settings;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.command.Command;
@@ -43,26 +44,26 @@ public class RegisterCommand implements CommandExecutor {
                                 // Registers the user, if successful, adds the user to the active sessions
                                 if (Auth.register(player.getUniqueId(), player.getName(), password, conn)) {
                                     plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(new UserModel(player.getUniqueId(), player.getName())));
-                                    player.sendMessage(DefaultMessages.REGISTER_SUCCESS);
+                                    player.sendMessage(Settings.getMessage(DefaultMessages.REGISTER_SUCCESS));
                                 } else {
-                                    player.sendMessage(DefaultMessages.CRITICAL_REGISTER_ERROR);
+                                    player.sendMessage(Settings.getMessage(DefaultMessages.CRITICAL_REGISTER_ERROR));
                                 }
                             } else {
                                 // If the user is not allowed to register, sends the message explaining why to the player
                                 player.sendMessage(ChatColor.RED + allowedToRegister);
                             }
                         } catch (Exception e) {
-                            player.sendMessage(DefaultMessages.CRITICAL_REGISTER_ERROR);
+                            player.sendMessage(Settings.getMessage(DefaultMessages.CRITICAL_REGISTER_ERROR));
                             System.out.println("RemoteAuth --/ERROR/-- Error performing user registration - class {" + RegisterDAO.class.getName() + "}");
                         }
                     } else {
-                        player.sendMessage(DefaultMessages.PASSWORDS_DO_NOT_MATCH);
+                        player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_PASSWORDS_NOT_MATCH));
                     }
                 } else {
-                    sender.sendMessage(DefaultMessages.REGISTER_USAGE);
+                    sender.sendMessage(Settings.getMessage(DefaultMessages.ERROR_REGISTER_USAGE));
                 }
             } else {
-                player.sendMessage(DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
+                player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_ALREADY_LOGGED_IN));
             }
         }
         return true;

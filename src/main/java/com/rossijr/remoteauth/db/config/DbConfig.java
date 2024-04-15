@@ -1,10 +1,11 @@
 package com.rossijr.remoteauth.db.config;
 
 
+import com.rossijr.remoteauth.config.Settings;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
-import java.io.File;
 
 public class DbConfig {
     /**
@@ -18,13 +19,7 @@ public class DbConfig {
 
     static {
         // Generate the path to the db.properties file
-        String propertiesPath = System.getProperty("user.dir") +
-                File.separator +
-                "plugins" +
-                File.separator +
-                "RemoteAuth" +
-                File.separator +
-                "db.properties";
+        String propertiesPath = Settings.getDbFilePath();
 
         // Load the properties file into the properties object
         try (InputStream input = new FileInputStream(propertiesPath)) {

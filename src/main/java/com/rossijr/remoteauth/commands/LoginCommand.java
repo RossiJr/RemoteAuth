@@ -3,7 +3,8 @@ package com.rossijr.remoteauth.commands;
 import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.authentication.models.UserModel;
-import com.rossijr.remoteauth.config.DefaultMessages;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
+import com.rossijr.remoteauth.config.Settings;
 import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.command.Command;
@@ -38,21 +39,21 @@ public class LoginCommand implements CommandExecutor {
                         // the user will be added to the active sessions
                         if(user != null){
                             plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(user));
-                            player.sendMessage(DefaultMessages.LOGIN_SUCCESS);
+                            player.sendMessage(Settings.getMessage(DefaultMessages.LOGIN_SUCCESS));
                         } else {
-                            player.sendMessage(DefaultMessages.INVALID_USERNAME_OR_PASSWORD);
+                            player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_INVALID_USERNAME_PASSWORD));
                         }
 
                     } catch (Exception e) {
-                        player.sendMessage(DefaultMessages.CRITICAL_LOG_IN_ERROR);
+                        player.sendMessage(Settings.getMessage(DefaultMessages.CRITICAL_LOG_IN_ERROR));
                         System.out.println("RemoteAuth --/ERROR/-- Error performing user login - class {" + Auth.class.getName() + "}");
                     }
                 } else {
-                    player.sendMessage(DefaultMessages.PLAYER_ALREADY_LOGGED_IN);
+                    player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_ALREADY_LOGGED_IN));
                 }
 
             } else {
-                player.sendMessage(DefaultMessages.LOGIN_USAGE);
+                player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_LOGIN_USAGE));
             }
         }
 
