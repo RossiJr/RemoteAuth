@@ -159,6 +159,10 @@ messages.welcome.login_success= &aYou have successfully logged in!
 > 
 > Note that those are only a few examples of the messages you can configure. In the table below you can see all the messages that can be configured.
 
+---
+
+In the following table is possible to see all the messages that can be configured in the `messages.properties` file:
+
 |                 Message Key                  |                                                              Description                                                               |         Possible Variables          |                                                   Default Value                                                    |
 |:--------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------:|:------------------------------------------------------------------------------------------------------------------:|
 |             `prefix.chat_prefix`             |                                               The prefix that will be shown in the chat                                                |                  -                  |                                              `&7[&bRemoteAuth&7] &r`                                               |
@@ -189,29 +193,31 @@ messages.welcome.login_success= &aYou have successfully logged in!
 To edit the source code, you can clone this repository and open it in your favorite IDE. After making the changes, you
 can build the project using Maven. To do so, you can use the following commands:
 
+1. Navigate to the directory where you want to clone the repository
+2. Clone the repository
+3. Navigate to the project root folder
+4. Build the project:
+   1. clean: remove any file into target folder
+   2. install: compile the project and install it in the local repository
+
 ```shell
-# Navigate to the directory where you want to clone the repository
 cd {directory}
 ```
 
 ```shell
-# Clone the repository
 git clone https://github.com/RossiJr/RemoteAuth.git
 ```
 
 ```shell
-# Navigate to the project root folder
 cd RemoteAuth
 ```
 
 ```shell
-# Build the project | clean: remove any file into target folder
-#                   | install: compile the project and install it in the local repository
 mvn clean install
 ```
 
 After this process, you will have the jar file in the `target` folder. You can use this jar file to replace the one in
-your server's `\plugins` folder.
+your server's `/plugins` folder.
 
 ### Commands <a name="commands"></a>
 
@@ -224,4 +230,4 @@ your server's `\plugins` folder.
 ## Contact <a name="contact"></a>
 
 If you have any questions, suggestions or want to contribute, please contact me
-at [my Spigot](https://www.spigotmc.org/members/rossijr.1217740/) or at Discord: `rossijr - RossiJr#4823`.
+at [my Spigot](https://www.spigotmc.org/members/rossijr.1217740/) or at [Discord](https://discordapp.com/users/261526981701533697).
