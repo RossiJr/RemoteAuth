@@ -25,7 +25,7 @@
     - [Messages Configuration](#messages-configuration)
     - [Build](#build)
     - [Commands](#commands)
-  - [Contact](#contact)
+- [Contact](#contact)
 
 
 ## Why to use RemoteAuth? <a name="why-to-use-remoteauth"></a>
@@ -62,7 +62,7 @@ single server.
 
 #### Download <a name="download"></a>
 
-To download RemoteAuth, you can use this [link](https://www.spigotmc.org/resources/remoteauth.116205/) in Spigot to download the latest version of the library. After
+To download RemoteAuth, you can use this [link](https://www.spigotmc.org/resources/remoteauth.116205/) in Spigot to download the latest version of the plugin. After
 downloading the jar file, you can add it to your server's `/plugins` folder.
 
 Make sure to configure properly the database connection and the spawn point (optional) before starting the server.
@@ -190,7 +190,7 @@ In the following table is possible to see all the messages that can be configure
 
 > Note that you have to have Maven and Git installed on your machine to build the project in the shown way.
 
-To edit the source code, you can clone this repository and open it in your favorite IDE. After making the changes, you
+To edit the source code, you can fork this repository and open it in your favorite IDE. After making the changes, you
 can build the project using Maven. To do so, you can use the following commands:
 
 1. Navigate to the directory where you want to clone the repository
@@ -220,6 +220,8 @@ After this process, you will have the jar file in the `target` folder. You can u
 your server's `/plugins` folder.
 
 ### Commands <a name="commands"></a>
+
+In the table below is possible to see all the commands that can be used in the RemoteAuth plugin, with their respective usage and permission.
 
 |     Name      |                                Usage                                |                 Command                  |      Permission       |
 |:-------------:|:-------------------------------------------------------------------:|:----------------------------------------:|:---------------------:|
