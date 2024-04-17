@@ -9,6 +9,9 @@ commands:
   register:
       description: Register to the server
       usage: /<command> <password> <password>
+  changepassword:
+    description: Change your password
+    usage: /<command> <newpassword>
   rasetspawn:
     description: Set the spawn point
     usage: /<command>

@@ -2,6 +2,7 @@ package com.rossijr.remoteauth;
 
 import com.rossijr.remoteauth.authentication.Auth;
 import com.rossijr.remoteauth.commands.AdminCommands;
+import com.rossijr.remoteauth.commands.ChangePasswordCommand;
 import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
 import com.rossijr.remoteauth.config.messages.DefaultMessages;
@@ -87,6 +88,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         try {
             Objects.requireNonNull(getCommand("login")).setExecutor(new LoginCommand(this));
             Objects.requireNonNull(getCommand("register")).setExecutor(new RegisterCommand(this));
+            Objects.requireNonNull(getCommand("changepassword")).setExecutor(new ChangePasswordCommand());
             Objects.requireNonNull(getCommand("rasetspawn")).setExecutor(new AdminCommands(this));
         } catch (NullPointerException e) {
             Bukkit.shutdown();

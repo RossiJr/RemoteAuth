@@ -1,6 +1,7 @@
 package com.rossijr.remoteauth.authentication;
 
 import com.rossijr.remoteauth.authentication.dao.LoginDAO;
+import com.rossijr.remoteauth.authentication.dao.PasswordDAO;
 import com.rossijr.remoteauth.authentication.dao.RegisterDAO;
 import com.rossijr.remoteauth.authentication.models.UserModel;
 
@@ -100,6 +101,23 @@ public class Auth {
      */
     public static boolean isUnregistered(UUID uuid, String username, Connection connection) {
         return !usernameExists(username, connection) && !uuidExists(uuid, connection);
+    }
+
+    /**
+     * Change the password of the user
+     * @param uuid UUID of the user
+     * @param password new password of the user
+     * @param connection open connection to the database
+     * @return true if the password was successfully changed, false otherwise
+     */
+    public static boolean changePassword(UUID uuid, String password, Connection connection) {
+        password = Utils.hashString(password);
+        try{
+            return PasswordDAO.changePassword(uuid, password, connection);
+        }catch (Exception e){
+            System.out.println("RemoteAuth --/ERROR/-- Error during changePassword - class {" + Auth.class.getName() + "}");
+        }
+        return false;
     }
 
 }

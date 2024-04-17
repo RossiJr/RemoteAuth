@@ -32,8 +32,15 @@ public enum DefaultMessages {
     ERROR_LOGIN_USAGE("messages.error.login_usage", Settings.getMessage(CHAT_PREFIX) + "§cUsage: /login <password>"),
     ERROR_REGISTER_USAGE("messages.error.register_usage", Settings.getMessage(CHAT_PREFIX) + "§cUsage: /register <password> <confirmPassword>"),
 
-    SUCCESS_SPAWN_SET("messages.success.spawn_set", Settings.getMessage(CHAT_PREFIX) + "§aSpawn set at (§f%x%§a, §f%y%§a, §f%z%§a)")
-    ;
+    SUCCESS_SPAWN_SET("messages.success.spawn_set", Settings.getMessage(CHAT_PREFIX) + "§aSpawn set at (§f%x%§a, §f%y%§a, §f%z%§a)"),
+
+    SUCCESS_PASSWORD_CHANGED("messages.success.password_changed", Settings.getMessage(CHAT_PREFIX) + "§aPassword changed successfully."),
+    ERROR_INVALID_ARGUMENTS_PASSWORD_CHANGE("messages.error.invalid_arguments_password_change", Settings.getMessage(CHAT_PREFIX) + "§cInvalid arguments. Usage: /changepassword <password>"),
+    ERROR_PASSWORD_CHANGE("messages.error.password_change", Settings.getMessage(CHAT_PREFIX) + "§cError while changing password."),
+    CRITICAL_PASSWORD_CHANGE_ERROR("messages.error.critical_password_change_error", Settings.getMessage(CHAT_PREFIX) + "§c§lA critical error occurred while changing the password. Please contact an administrator."),
+
+
+    ERROR_PLAYER_NOT_FOUND("messages.error.player_not_found", Settings.getMessage(CHAT_PREFIX) + "§cPlayer not found.");
 
     public final String path;
     public final String message;
