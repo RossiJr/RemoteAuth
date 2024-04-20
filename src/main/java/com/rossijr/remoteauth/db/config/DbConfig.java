@@ -24,6 +24,22 @@ public class DbConfig {
         // Load the properties file into the properties object
         try (InputStream input = new FileInputStream(propertiesPath)) {
             properties.load(input);
+            String dbms = properties.getProperty("db.dbms");
+            if (dbms == null || dbms.isBlank()) {
+                throw new RuntimeException("Database management system not defined in db.properties");
+            }
+
+            // Loads the database's driver
+            switch (dbms) {
+                case "mysql":
+                    bdStartup("com.mysql.cj.jdbc.Driver");
+                    break;
+                case "postgresql":
+                    bdStartup("org.postgresql.Driver");
+                    break;
+                default:
+                    throw new RuntimeException("Database management system not supported");
+            }
         } catch (Exception e) {
             properties.clear();
         }
@@ -31,6 +47,7 @@ public class DbConfig {
 
     /**
      * Get the database URL, replacing the placeholders with the values from the properties file
+     *
      * @return Database URL
      */
     public static String getDbUrl() {
@@ -42,6 +59,7 @@ public class DbConfig {
 
     /**
      * Get the database username
+     *
      * @return Database username
      */
     public static String getDbUsername() {
@@ -50,6 +68,7 @@ public class DbConfig {
 
     /**
      * Get the database password
+     *
      * @return Database password
      */
     public static String getDbPassword() {
@@ -58,9 +77,10 @@ public class DbConfig {
 
     /**
      * Get the user schema
+     *
      * @return User schema
      */
-    public static String getUserSchema(){
+    public static String getUserSchema() {
         String schema = properties.getProperty("db.user_schema");
         // Return the schema if it is not null, otherwise return "public"
         return schema != null ? schema : "public";
@@ -68,36 +88,40 @@ public class DbConfig {
 
     /**
      * Get the user table
+     *
      * @return User table
      */
-    public static String getUserTable(){
+    public static String getUserTable() {
         String table = properties.getProperty("db.user_table");
         return table != null ? table : "users";
     }
 
     /**
      * Get the username column
+     *
      * @return Username column
      */
-    public static String getUsernameColumn(){
+    public static String getUsernameColumn() {
         String column = properties.getProperty("db.username_column");
         return column != null ? column : "username";
     }
 
     /**
      * Get the password column
+     *
      * @return Password column
      */
-    public static String getPasswordColumn(){
+    public static String getPasswordColumn() {
         String column = properties.getProperty("db.password_column");
         return column != null ? column : "password";
     }
 
     /**
      * Get the UUID column
+     *
      * @return UUID column
      */
-    public static String getUUIDColumn(){
+    public static String getUUIDColumn() {
         String column = properties.getProperty("db.uuid_column");
         return column != null ? column : "uuid";
     }
@@ -106,4 +130,11 @@ public class DbConfig {
         return !properties.isEmpty();
     }
 
+    public static void bdStartup(String driverClassName) throws RuntimeException {
+        try {
+            Class.forName(driverClassName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Error loading database driver", e);
+        }
+    }
 }

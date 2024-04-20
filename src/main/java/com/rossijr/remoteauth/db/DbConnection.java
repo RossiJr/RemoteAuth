@@ -10,25 +10,30 @@ import java.sql.SQLException;
 /**
  * Responsible to
  */
-public class DbConnection {
+public class DbConnection{
+
+
+    private final Connection connection;
+
     /**
-     * Connect to the database
-     * @return Connection object
-     * @throws SQLException if connection fails
+     * Generates a connection to the database
+     * @throws SQLException if it is not possible to connect to the database
      */
-    public static Connection connect() throws SQLException {
+    public DbConnection() throws SQLException {
         try {
             var jdbcUrl = DbConfig.getDbUrl();
             var user = DbConfig.getDbUsername();
             var password = DbConfig.getDbPassword();
-            var connection = DriverManager.getConnection(jdbcUrl, user, password);
-            if(connection != null) {
-                return connection;
-            } else {
-                throw new SQLException();
+            this.connection = DriverManager.getConnection(jdbcUrl, user, password);
+            if(connection == null) {
+                throw new SQLException("Not possible to connect to the database");
             }
         } catch (SQLException e) {
             throw new SQLException("Error connecting to database", e);
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }

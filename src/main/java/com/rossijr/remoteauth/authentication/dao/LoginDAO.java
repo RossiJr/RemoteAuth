@@ -1,6 +1,7 @@
 package com.rossijr.remoteauth.authentication.dao;
 
 import com.rossijr.remoteauth.authentication.models.UserModel;
+import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.db.config.DbConfig;
 
 import java.sql.Connection;
@@ -17,7 +18,6 @@ public class LoginDAO {
      * Method to perform the login query
      * @param username username of the user
      * @param password password of the user
-     * @param conn open connection to the database
      * @return UserModel object if the user is authenticated, null otherwise
      */
     public static UserModel login(String username, String password, Connection conn) {
@@ -43,6 +43,15 @@ public class LoginDAO {
         } catch (SQLException e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during performing query - class {" + LoginDAO.class.getName() + "}");
             System.out.println("RemoteAuth --/ERROR/-- Query: " + sql);
+        }
+        return null;
+    }
+
+    public static UserModel login(String username, String password) {
+        try (Connection conn = new DbConnection().getConnection()) {
+            return login(username, password, conn);
+        } catch (SQLException e) {
+            System.out.println("RemoteAuth --/ERROR/-- Error during getting connection - class {" + LoginDAO.class.getName() + "}");
         }
         return null;
     }
