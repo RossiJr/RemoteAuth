@@ -4,7 +4,7 @@ import com.rossijr.remoteauth.db.queries.QueryGenerator;
 
 public class PostgreSQLQueryGenerator implements QueryGenerator {
     @Override
-    public String generateInsertQuery(String tableName, String firstName, String lastName) {
+    public String generateInsertObjectQuery(String tableName, Object object) {
         return "";
     }
 }
