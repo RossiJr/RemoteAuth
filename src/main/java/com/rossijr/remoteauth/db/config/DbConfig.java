@@ -2,6 +2,9 @@ package com.rossijr.remoteauth.db.config;
 
 
 import com.rossijr.remoteauth.config.Settings;
+import com.rossijr.remoteauth.db.queries.QueryFactory;
+import com.rossijr.remoteauth.db.queries.factories.MySQLQueryFactory;
+import com.rossijr.remoteauth.db.queries.factories.PostgreSQLQueryFactory;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -11,7 +14,7 @@ public class DbConfig {
     /**
      * Properties loaded from db.properties file
      */
-    private static final Properties properties = new Properties();
+    private static Properties properties = new Properties();
     /**
      * Database template URL
      */
@@ -136,5 +139,54 @@ public class DbConfig {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Error loading database driver", e);
         }
+    }
+
+    public static void setProperties(Properties properties) {
+        DbConfig.properties = properties;
+    }
+
+    /**
+     * Get the value of a key from the properties file
+     * @param key Key to get the value from
+     * @return Value of the key
+     */
+    public static String getValue(String key){
+        switch (key){
+            case "db.dbms":
+                return properties.getProperty("db.dbms");
+            case "db.host":
+                return properties.getProperty("db.host");
+            case "db.port":
+                return properties.getProperty("db.port");
+            case "db.database":
+                return properties.getProperty("db.database");
+            case "db.user_table":
+                return getUserTable();
+            case "db.uuid_column":
+                return getUUIDColumn();
+            case "db.username_column":
+                return getUsernameColumn();
+            case "db.password_column":
+                return getPasswordColumn();
+            case "db.username":
+                return getDbUsername();
+            case "db.password":
+                return getDbPassword();
+            default:
+                return properties.getProperty(key);
+        }
+    }
+
+    public static QueryFactory getDbmsFactory(){
+        QueryFactory factory;
+        String dbms = properties.getProperty("db.dbms");
+        if(dbms.equals("mysql"))
+            factory = new MySQLQueryFactory<>();
+        else if (dbms.equals("postgresql"))
+            factory = new PostgreSQLQueryFactory<>();
+        else
+            throw new RuntimeException("Database management system not supported");
+
+        return factory;
     }
 }

@@ -32,9 +32,9 @@ public class LoginCommand implements CommandExecutor {
                 if (!plugin.getActiveSessions().containsKey(player.getUniqueId())) {
                     String username = sender.getName();
                     String password = args[0];
-                    try (Connection conn = DbConnection.connect()) {
+                    try{
                         // Checks if the username and password are correct
-                        UserModel user = Auth.login(username, password, conn);
+                        UserModel user = Auth.login(username, password);
                         // If the user is correct, an UserModel object will be created and
                         // the user will be added to the active sessions
                         if(user != null){

@@ -21,7 +21,7 @@ public class ChangePasswordCommand implements CommandExecutor {
             if (strings.length > 0 && strings.length < 3) {
                 // Change the password of the player who executed the command
                 if (strings.length == 1) {
-                    try (var conn = DbConnection.connect()) {
+                    try (var conn = new DbConnection().getConnection()) {
                         if (Auth.changePassword(player.getUniqueId(), strings[0], conn)) {
                             player.sendMessage(Settings.getMessage(DefaultMessages.SUCCESS_PASSWORD_CHANGED));
                         } else {
@@ -34,7 +34,7 @@ public class ChangePasswordCommand implements CommandExecutor {
                     // Change password of another player
                     Player alteredPasswordPlayer = player.getServer().getPlayer(strings[0]);
                     if(alteredPasswordPlayer != null) {
-                        try (var conn = DbConnection.connect()) {
+                        try (var conn = new DbConnection().getConnection()) {
                             if (Auth.changePassword(alteredPasswordPlayer.getUniqueId(), strings[1], conn)) {
                                 player.sendMessage(Settings.getMessage(DefaultMessages.SUCCESS_PASSWORD_CHANGED));
                             } else {

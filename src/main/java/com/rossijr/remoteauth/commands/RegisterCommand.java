@@ -37,7 +37,7 @@ public class RegisterCommand implements CommandExecutor {
                     String password = args[0], confirmPassword = args[1];
                     // Checks if the password and confirm password are the same
                     if (password.equals(confirmPassword)) {
-                        try (Connection conn = DbConnection.connect()) {
+                        try (Connection conn = new DbConnection().getConnection()) {
                             // Checks if the username and UUID are already registered and other important checks
                             String allowedToRegister = Auth.allowedToRegister(player.getName(), conn);
                             if (allowedToRegister == null) {

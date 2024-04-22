@@ -7,7 +7,6 @@ import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
 import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.Settings;
-import com.rossijr.remoteauth.config.StartupConfig;
 import com.rossijr.remoteauth.config.messages.ParameterBuilder;
 import com.rossijr.remoteauth.config.messages.Parameters;
 import com.rossijr.remoteauth.db.DbConnection;
@@ -118,7 +117,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
             }
         }
         // Load the database driver
-        StartupConfig.bdStartup("org.postgresql.Driver");
+//        StartupConfig.bdStartup("org.postgresql.Driver");
 
         // Use this class to register events
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -188,7 +187,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
                     spawnAngles[1], spawnAngles[0]));
         try {
             // Check if the player is registered
-            if (Auth.isUnregistered(e.getPlayer().getUniqueId(), e.getPlayer().getName(), DbConnection.connect())) {
+            if (Auth.isUnregistered(e.getPlayer().getUniqueId(), e.getPlayer().getName(), new DbConnection().getConnection())) {
                 e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.WELCOME_REGISTER, ParameterBuilder.create()
                         .addParameter(Parameters.PLAYER, e.getPlayer().getName())
                         .build()));
