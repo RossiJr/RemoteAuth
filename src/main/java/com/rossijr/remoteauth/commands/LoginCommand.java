@@ -16,7 +16,7 @@ import java.sql.Connection;
 
 
 public class LoginCommand implements CommandExecutor {
-    private RemoteAuth plugin;
+    private final RemoteAuth plugin;
 
     public LoginCommand(RemoteAuth plugin) {
         this.plugin = plugin;
@@ -38,7 +38,7 @@ public class LoginCommand implements CommandExecutor {
                         // If the user is correct, an UserModel object will be created and
                         // the user will be added to the active sessions
                         if(user != null){
-                            plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(user));
+                            plugin.doPostLogin(player.getUniqueId(), new SessionModel(user));
                             player.sendMessage(Settings.getMessage(DefaultMessages.LOGIN_SUCCESS));
                         } else {
                             player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_INVALID_USERNAME_PASSWORD));
@@ -57,6 +57,6 @@ public class LoginCommand implements CommandExecutor {
             }
         }
 
-            return true;
-        }
+        return true;
     }
+}

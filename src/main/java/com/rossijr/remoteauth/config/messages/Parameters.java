@@ -5,6 +5,7 @@ package com.rossijr.remoteauth.config.messages;
  */
 public enum Parameters {
     CHAT_PREFIX("%chatPrefix%"),
+    TIME("%time%"),
     PLAYER("%player%"),
     X("%x%"),
     Y("%y%"),

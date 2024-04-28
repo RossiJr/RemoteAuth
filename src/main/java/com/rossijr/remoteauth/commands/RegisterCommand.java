@@ -21,7 +21,7 @@ public class RegisterCommand implements CommandExecutor {
     /**
      * Plugin instance
      */
-    private RemoteAuth plugin;
+    private final RemoteAuth plugin;
     public RegisterCommand(RemoteAuth plugin) {
         this.plugin = plugin;
     }
@@ -43,7 +43,7 @@ public class RegisterCommand implements CommandExecutor {
                             if (allowedToRegister == null) {
                                 // Registers the user, if successful, adds the user to the active sessions
                                 if (Auth.register(player.getUniqueId(), player.getName(), password, conn)) {
-                                    plugin.getActiveSessions().put(player.getUniqueId(), new SessionModel(new UserModel(player.getUniqueId(), player.getName())));
+                                    plugin.doPostLogin(player.getUniqueId(), new SessionModel(new UserModel(player.getUniqueId(), player.getName())));
                                     player.sendMessage(Settings.getMessage(DefaultMessages.REGISTER_SUCCESS));
                                 } else {
                                     player.sendMessage(Settings.getMessage(DefaultMessages.CRITICAL_REGISTER_ERROR));

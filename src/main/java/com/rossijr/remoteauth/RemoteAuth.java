@@ -1,6 +1,7 @@
 package com.rossijr.remoteauth;
 
 import com.rossijr.remoteauth.authentication.Auth;
+import com.rossijr.remoteauth.authentication.models.Task;
 import com.rossijr.remoteauth.commands.AdminCommands;
 import com.rossijr.remoteauth.commands.ChangePasswordCommand;
 import com.rossijr.remoteauth.commands.LoginCommand;
@@ -21,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -34,6 +36,8 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      * Map of active sessions, where the key is the player's UUID and the value is the session model
      */
     private Map<UUID, SessionModel> activeSessions;
+    private Map<UUID, List<Task>> taskMap;
+
     /**
      * If the plugin is up, used to prevent players from joining before the plugin is ready
      */
@@ -79,7 +83,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         // Verify if exists the db.properties file or if is it properly configured
-        if(!DbConfig.isDbConfigured()) {
+        if (!DbConfig.isDbConfigured()) {
             Bukkit.shutdown();
             throw new RuntimeException("The db.properties file is not configured properly, or it's configured in the wrong place.");
         }
@@ -97,6 +101,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         // Initialize the active sessions map, guaranteeing that it is not null and empty
         activeSessions = new HashMap<>();
 
+        // Initialize the task map, guaranteeing that it is not null and empty
+        taskMap = new HashMap<>();
+
         // Load the configuration
         getConfig().options().copyDefaults();
         try {
@@ -112,7 +119,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
                 setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.x"),
                         getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
                         Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 System.out.println("Error loading spawn location from configuration file");
                 spawnSet = false;
             }
@@ -137,7 +144,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *
      * @param location The location to set as spawn
      */
-    private void setLocalSpawn(Location location) throws NullPointerException{
+    private void setLocalSpawn(Location location) throws NullPointerException {
         this.spawnCoordinates = new int[3];
         this.spawnAngles = new float[2];
 
@@ -154,7 +161,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *
      * @param location The location to set as spawn
      */
-    private void setConfigSpawn(Location location) throws NullPointerException{
+    private void setConfigSpawn(Location location) throws NullPointerException {
         try {
             getConfig().options().copyDefaults();
             getConfig().set("spawn.x", location.getBlockX());
@@ -182,6 +189,23 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+        BukkitTask taskPreKicking = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
+                .addParameter(Parameters.TIME, "15")
+                .build())), 300);
+        addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking, true));
+
+        BukkitTask taskPreKicking2 = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
+                .addParameter(Parameters.TIME, "5")
+                .build())), 500);
+        addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking2, true));
+
+        BukkitTask taskKickIfNotLoggedIn = Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (!isPlayerLogged(e.getPlayer().getUniqueId())) {
+                e.getPlayer().kickPlayer(Settings.getMessage(DefaultMessages.LOGIN_TIME_OUT_ALERT));
+            }
+        }, 600);
+        addTask(e.getPlayer().getUniqueId(), new Task(taskKickIfNotLoggedIn, true));
+
         // If the spawn is set, teleport the player to the spawn location
         if (spawnSet)
             e.getPlayer().teleport(new Location(Bukkit.getWorld(spawnWorld), spawnCoordinates[0], spawnCoordinates[1], spawnCoordinates[2],
@@ -269,7 +293,49 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * <p>Method used to check if the player is logged in.</p>
+     * @param playerUUID The player's UUID
+     * @return If the player is logged in
+     */
     private boolean isPlayerLogged(UUID playerUUID) {
         return activeSessions.containsKey(playerUUID);
+    }
+
+    /**
+     * <p>Method used to add a task to the player's login tasks.</p>
+     * @param playerUUID The player's UUID
+     * @param task The new task to add
+     */
+    public void addTask(UUID playerUUID, Task task) {
+        taskMap.computeIfAbsent(playerUUID, k -> new ArrayList<>());
+        taskMap.get(playerUUID).add(task);
+    }
+
+    /**
+     * <p>Method used to clear all the player's login tasks.</p>
+     * @param playerUUID The player's UUID
+     */
+    public void clearLoginTasks(UUID playerUUID) {
+        // Checks first if the player is in the task map
+        if (taskMap.get(playerUUID) != null) {
+            // If so, cancel all the player's login tasks
+            taskMap.get(playerUUID).stream().filter(Task::isPreLogin).forEach(Task::cancelTask);
+        }
+    }
+
+    /**
+     * <p>Method used to do all the player's post login procedures.</p>
+     * <p>Currently it does the following:</p>
+     * <ul>
+     *     <li>Clears the player's login tasks</li>
+     *     <li>Adds the player to the active sessions map</li>
+     * </ul>
+     * @param playerUUID The player's UUID
+     * @param sessionModel The session model
+     */
+    public void doPostLogin(UUID playerUUID, SessionModel sessionModel) {
+        clearLoginTasks(playerUUID);
+        this.activeSessions.put(playerUUID, sessionModel);
     }
 }
