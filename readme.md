@@ -14,19 +14,18 @@
 
 - [Why to use RemoteAuth?](#why-to-use-remoteauth)
 - [Features](#features)
-  - [Available DBMSs](#available-dbmss)
+    - [Available DBMSs](#available-dbmss)
 - [Download, Usage, and Examples](#download-usage-and-examples)
-  - [Installation](#installation)
-    - [Download](#download)
-    - [Database Configuration](#database-configuration)
-    - [Spawn Configuration](#spawn-configuration)
-      - [First option - With command (RECOMMENDED)](#db-config-first-option)
-      - [Second option - Manually](#db-config-second-option)
-    - [Messages Configuration](#messages-configuration)
-  - [Build](#build)
-  - [Commands](#commands)
+    - [Installation](#installation)
+        - [Download](#download)
+        - [Database Configuration](#database-configuration)
+        - [Spawn Configuration](#spawn-configuration)
+            - [First option - With command (RECOMMENDED)](#db-config-first-option)
+            - [Second option - Manually](#db-config-second-option)
+        - [Messages Configuration](#messages-configuration)
+    - [Build](#build)
+    - [Commands](#commands)
 - [Contact](#contact)
-
 
 ## Why to use RemoteAuth? <a name="why-to-use-remoteauth"></a>
 
@@ -62,19 +61,20 @@ single server.
 
 #### Download <a name="download"></a>
 
-To download RemoteAuth, you can use this [link](https://www.spigotmc.org/resources/remoteauth.116205/) in Spigot to download the latest version of the plugin. After
+To download RemoteAuth, you can use this [link](https://www.spigotmc.org/resources/remoteauth.116205/) in Spigot to
+download the latest version of the plugin. After
 downloading the jar file, you can add it to your server's `/plugins` folder.
 
 Make sure to configure properly the database connection and the spawn point (optional) before starting the server.
 
 #### Database Configuration <a name="database-configuration"></a>
 
-To configure RemoteAuth, you need to create a file in the plugin directory `/plugins/RemoteAuth/db.properties`. This file
+To configure RemoteAuth, you need to create a file in the plugin directory `/plugins/RemoteAuth/db.properties`. This
+file
 should contain the following properties, as shown in the example below:
 
 ```properties
 # THOSE ARE THE DEFAULT VALUES, YOU MUST CHANGE TO YOUR OWN VALUES #
-
 # REQUIRED FIELDS
 db.dbms=postgresql
 db.host=localhost
@@ -82,7 +82,6 @@ db.port=5432
 db.database=RemoteAuthTest
 db.username=postgres
 db.password=postgres
-
 # OPTIONAL FIELDS
 db.user_schema=public
 db.user_table=users
@@ -105,11 +104,13 @@ db.password_column=password
 - `db.password_column` - The column where the user's password is stored. **(OPTIONAL)**
 
 > - **In case of no optional fields set, the plugin will use the default values (the ones shown in the example above).**
-> - **If the file doesn't exist or any error has happened during the connection to the database, the plugin will shut the server down.**
+> - **If the file doesn't exist or any error has happened during the connection to the database, the plugin will shut
+    the server down.**
 
 #### Spawn Configuration <a name="spawn-configuration"></a>
 
-The spawn point is used to teleport the player when they log in. If the spawn point is not set, the player won't be teleported.
+The spawn point is used to teleport the player when they log in. If the spawn point is not set, the player won't be
+teleported.
 
 If you want to use the spawn point feature, you must configure it with one of the options below, or, in case you don't
 want to use it, you can skip this step.
@@ -138,26 +139,30 @@ the `/plugin/RemoteAuth/config.yml` file is empty.**
             pitch: 0.0
             yaw: 0.0
             world: world
-      
+
     - To change it, you can use the same format, changing the values.
-  > **Make sure to use the same format as the example above. Otherwise, it will not work!!** 
+  > **Make sure to use the same format as the example above. Otherwise, it will not work!!**
 
 #### Messages Configuration <a name="messages-configuration"></a>
+
 > Added in the version 1.2.0 of the plugin
 
-You can configure the messages that the plugin will send to the player in the `/plugins/RemoteAuth/messages.properties` file in the following format:
+You can configure the messages that the plugin will send to the player in the `/plugins/RemoteAuth/messages.properties`
+file in the following format:
 
 ```properties
 # Example of the messages.properties file
 prefix.chat_prefix=&7[&bRemoteAuth&7] &r
-
 messages.welcome.login=&aHello &a&l%player%&a&r - Nice to see you again!\n&a> Use /login <password> to login!
 messages.welcome.register=&aHello %player% - Welcome to the server!\n&a> Use /register <password> <confirmPassword> to register!
-messages.welcome.login_success= &aYou have successfully logged in!
+messages.welcome.login_success=&aYou have successfully logged in!
 ```
-> _**IMPORTANT** -> The default chat modifier is `§`. However, due to encoding issues, you must use `&` instead of `§` in the messages.properties file._
-> 
-> Note that those are only a few examples of the messages you can configure. In the table below you can see all the messages that can be configured.
+
+> _**IMPORTANT** -> The default chat modifier is `§`. However, due to encoding issues, you must use `&` instead of `§`
+in the messages.properties file._
+>
+> Note that those are only a few examples of the messages you can configure. In the table below you can see all the
+> messages that can be configured.
 
 ---
 
@@ -171,6 +176,8 @@ In the following table is possible to see all the messages that can be configure
 |          `messages.welcome.login_success`          |                               The message that will be shown to the player when they log in successfully                               |           `%chatPrefix%`            |                                  `%chatPrefix%§aYou have successfully logged in!`                                  |
 |        `messages.welcome.register_success`         |                              The message that will be shown to the player when they register successfully                              |           `%chatPrefix%`            |                               `%chatPrefix%§aYou have been successfully registered!`                               |
 |            `messages.success.spawn_set`            |                         The message that will be shown to the player when the spawn point is set successfully                          | `%chatPrefix%`, `%x%`, `%y%`, `%z%` |                              `%chatPrefix%§aSpawn set at (§f%x%§a, §f%y%§a, §f%z%§a)`                              |
+|          `messages.alert.login_time_out`           |                             The message that will be shown to the player when the login process times out                              |           `%chatPrefix%`            |                           `%chatPrefix%§cYou took too long to log in. Please try again.`                           |
+|        `messages.alert.pre_login_time_out`         |                          The message that will be shown to the player when the login time is about to run out                          |      `%chatPrefix%`, `%time%`       |                `%chatPrefix%§cYou have to log in in %time% seconds. Otherwise, you will be kicked.`                |
 |           `messages.error.no_permission`           |                      The message that will be shown to the player when they don't have permission to do something                      |           `%chatPrefix%`            |                               `%chatPrefix%§cYou don't have permission to do that!`                                |
 |         `messages.error.already_logged_in`         |                  The message that will be shown to the player when they are already logged in and try to log in again                  |           `%chatPrefix%`            |                                     `%chatPrefix%§cYou are already logged in!`                                     |
 |           `messages.error.not_logged_in`           |                 The message that will be shown to the player when they are not logged in and try to do something else                  |           `%chatPrefix%`            |                                       `%chatPrefix%§cYou are not logged in!`                                       |
@@ -189,7 +196,6 @@ In the following table is possible to see all the messages that can be configure
 |  `messages.error.crictical_password_change_error`  |             The message that will be shown to the player when a critical error happens during the password change process              |           `%chatPrefix%`            |       `%chatPrefix%§c§lA critical error occurred while changing password. Please contact an administrator.`        |
 |         `messages.error.player_not_found`          |                       The message that will be shown to the player when the player is not found in the database                        |           `%chatPrefix%`            |                                         `%chatPrefix%§cPlayer not found.`                                          |
 
-
 ### Build <a name="build"></a>
 
 > Note that you have to have Maven and Git installed on your machine to build the project in the shown way.
@@ -201,8 +207,8 @@ can build the project using Maven. To do so, you can use the following commands:
 2. Clone the repository
 3. Navigate to the project root folder
 4. Build the project:
-   1. clean: remove any file into target folder
-   2. install: compile the project and install it in the local repository
+    1. clean: remove any file into target folder
+    2. install: compile the project and install it in the local repository
 
 ```shell
 cd {directory}
@@ -225,7 +231,8 @@ your server's `/plugins` folder.
 
 ### Commands <a name="commands"></a>
 
-In the table below is possible to see all the commands that can be used in the RemoteAuth plugin, with their respective usage and permission.
+In the table below is possible to see all the commands that can be used in the RemoteAuth plugin, with their respective
+usage and permission.
 
 |            Name             |                                Usage                                |                 Command                  |         Permission          |
 |:---------------------------:|:-------------------------------------------------------------------:|:----------------------------------------:|:---------------------------:|
@@ -238,4 +245,5 @@ In the table below is possible to see all the commands that can be used in the R
 ## Contact <a name="contact"></a>
 
 If you have any questions, suggestions or want to contribute, please contact me
-at [my Spigot](https://www.spigotmc.org/members/rossijr.1217740/) or at [Discord](https://discordapp.com/users/261526981701533697).
+at [my Spigot](https://www.spigotmc.org/members/rossijr.1217740/) or
+at [Discord](https://discordapp.com/users/261526981701533697).

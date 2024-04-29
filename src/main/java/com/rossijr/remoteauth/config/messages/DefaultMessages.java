@@ -23,6 +23,9 @@ public enum DefaultMessages {
     ERROR_COMMAND_NOT_FOUND("messages.error.command_not_found", Settings.getMessage(CHAT_PREFIX) + "§cCommand not found."),
     ERROR_SERVER_NOT_UP("messages.error.server_not_up", Settings.getMessage(CHAT_PREFIX) + "§cThe server is not up yet, try again later."),
 
+    LOGIN_TIME_OUT_ALERT("messages.alert.login_time_out", Settings.getMessage(CHAT_PREFIX) + "§cYou took too long to log in. Please try again."),
+    PRE_LOGIN_TIME_OUT_ALERT("messages.alert.pre_login_time_out", Settings.getMessage(CHAT_PREFIX) + "§cYou have to log in in %time% seconds. Otherwise, you will be kicked."),
+
     CRITICAL_LOG_IN_ERROR("messages.error.critical_login_error", Settings.getMessage(CHAT_PREFIX) + "§c§lA critical error occurred while logging in. Please contact an administrator."),
     CRITICAL_REGISTER_ERROR("messages.error.critical_register_error", Settings.getMessage(CHAT_PREFIX) + "§c§lA critical error occurred while registering. Please contact an administrator."),
     CRITICAL_ISREGISTERED_ERROR("messages.error.critical_isregistered_error", Settings.getMessage(CHAT_PREFIX) + "§c§lA critical error occurred while checking if you are registered. Please contact an administrator."),
