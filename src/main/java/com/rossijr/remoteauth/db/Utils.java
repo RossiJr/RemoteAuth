@@ -1,4 +1,4 @@
-package com.rossijr.remoteauth.authentication;
+package com.rossijr.remoteauth.db;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

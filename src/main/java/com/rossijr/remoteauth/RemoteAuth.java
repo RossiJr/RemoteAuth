@@ -1,16 +1,15 @@
 package com.rossijr.remoteauth;
 
-import com.rossijr.remoteauth.authentication.Auth;
+import com.rossijr.remoteauth.authentication.AuthManager;
 import com.rossijr.remoteauth.authentication.models.Task;
 import com.rossijr.remoteauth.commands.AdminCommands;
 import com.rossijr.remoteauth.commands.ChangePasswordCommand;
 import com.rossijr.remoteauth.commands.LoginCommand;
 import com.rossijr.remoteauth.commands.RegisterCommand;
-import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.Settings;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.messages.ParameterBuilder;
 import com.rossijr.remoteauth.config.messages.Parameters;
-import com.rossijr.remoteauth.db.DbConnection;
 import com.rossijr.remoteauth.db.config.DbConfig;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.Bukkit;
@@ -211,7 +210,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
                     spawnAngles[1], spawnAngles[0]));
         try {
             // Check if the player is registered
-            if (Auth.isUnregistered(e.getPlayer().getUniqueId(), e.getPlayer().getName(), new DbConnection().getConnection())) {
+            if (AuthManager.isAllowedToRegister(e.getPlayer().getUniqueId())) {
                 e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.WELCOME_REGISTER, ParameterBuilder.create()
                         .addParameter(Parameters.PLAYER, e.getPlayer().getName())
                         .build()));
@@ -222,7 +221,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
             }
         } catch (Exception ex) {
             Objects.requireNonNull(Bukkit.getPlayer(e.getPlayer().getUniqueId())).kickPlayer(Settings.getMessage(DefaultMessages.CRITICAL_ISREGISTERED_ERROR));
-            System.out.println("RemoteAuth --/ERROR/-- Error checking if " + e.getPlayer().getName() + " was registered - class {" + Auth.class.getName() + "}");
+            System.out.println("RemoteAuth --/ERROR/-- Error checking if " + e.getPlayer().getName() + " was registered - class {" + AuthManager.class.getName() + "}");
         }
     }
 

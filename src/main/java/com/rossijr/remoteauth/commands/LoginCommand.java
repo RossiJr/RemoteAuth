@@ -1,18 +1,15 @@
 package com.rossijr.remoteauth.commands;
 
 import com.rossijr.remoteauth.RemoteAuth;
-import com.rossijr.remoteauth.authentication.Auth;
+import com.rossijr.remoteauth.authentication.AuthManager;
 import com.rossijr.remoteauth.authentication.models.UserModel;
-import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.Settings;
-import com.rossijr.remoteauth.db.DbConnection;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.sql.Connection;
 
 
 public class LoginCommand implements CommandExecutor {
@@ -34,7 +31,7 @@ public class LoginCommand implements CommandExecutor {
                     String password = args[0];
                     try{
                         // Checks if the username and password are correct
-                        UserModel user = Auth.login(username, password);
+                        UserModel user = AuthManager.login(username, password);
                         // If the user is correct, an UserModel object will be created and
                         // the user will be added to the active sessions
                         if(user != null){
@@ -46,7 +43,7 @@ public class LoginCommand implements CommandExecutor {
 
                     } catch (Exception e) {
                         player.sendMessage(Settings.getMessage(DefaultMessages.CRITICAL_LOG_IN_ERROR));
-                        System.out.println("RemoteAuth --/ERROR/-- Error performing user login - class {" + Auth.class.getName() + "}");
+                        System.out.println("RemoteAuth --/ERROR/-- Error performing user login - class {" + AuthManager.class.getName() + "}");
                     }
                 } else {
                     player.sendMessage(Settings.getMessage(DefaultMessages.ERROR_ALREADY_LOGGED_IN));

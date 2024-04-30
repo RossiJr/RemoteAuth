@@ -1,8 +1,8 @@
 package com.rossijr.remoteauth.commands;
 
 import com.rossijr.remoteauth.RemoteAuth;
-import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.Settings;
+import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.messages.ParameterBuilder;
 import com.rossijr.remoteauth.config.messages.Parameters;
 import org.bukkit.command.Command;

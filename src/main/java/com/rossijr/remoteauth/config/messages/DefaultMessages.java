@@ -20,6 +20,7 @@ public enum DefaultMessages {
     ERROR_ALREADY_LOGGED_IN("messages.error.already_logged_in", Settings.getMessage(CHAT_PREFIX) + "§cYou are already logged in."),
     ERROR_NOT_LOGGED_IN("messages.error.not_logged_in", Settings.getMessage(CHAT_PREFIX) + "§cYou are not logged in."),
     ERROR_INVALID_USERNAME_PASSWORD("messages.error.invalid_username_password", Settings.getMessage(CHAT_PREFIX) + "§cInvalid username or password."),
+    ERROR_ALREADY_REGISTERED("messages.error.already_registered", Settings.getMessage(CHAT_PREFIX) + "§cYou are already registered."),
     ERROR_COMMAND_NOT_FOUND("messages.error.command_not_found", Settings.getMessage(CHAT_PREFIX) + "§cCommand not found."),
     ERROR_SERVER_NOT_UP("messages.error.server_not_up", Settings.getMessage(CHAT_PREFIX) + "§cThe server is not up yet, try again later."),
 
