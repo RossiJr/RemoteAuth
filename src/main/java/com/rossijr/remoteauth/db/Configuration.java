@@ -8,10 +8,17 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.util.Properties;
 
+/**
+ * Class used to configure the database connection and related properties
+ */
 public class Configuration {
     private static Properties properties;
     private static SessionFactory sessionFactory;
 
+    /**
+     * Method used to initialize the database connection, set the properties and add the entities
+     * @param properties Properties object with the database connection properties
+     */
     public static void init(Properties properties){
         try {
             Configuration.properties = properties;

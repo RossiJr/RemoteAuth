@@ -1,11 +1,10 @@
 package com.rossijr.remoteauth.authentication;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.rossijr.remoteauth.authentication.models.UserModel;
+import com.rossijr.remoteauth.db.GenericDAO;
 import com.rossijr.remoteauth.db.GenericDAOI;
-import com.rossijr.remoteauth.db.dependencyinjection.AppModule;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -17,35 +16,42 @@ import java.util.UUID;
  * <p>It is responsible for authenticate users, register them and update any user data. </p>
  */
 public class AuthManager {
-    private static GenericDAOI<UserModel> userDao;
     /**
-     * Login method to authenticate the user. Refactored to use the GenericDAO class.
-     *
-     * @param username username of the user
-     * @param password password of the user (NOT HASHED)
-     * @return UserModel object if the user is authenticated, null otherwise
+     * <p>GenericDAO object to interact with the database.</p>
+     * <p>It is used to perform CRUD operations in the UserModel class</p>
      */
+    private static final GenericDAOI<UserModel> userDao;
+    private static final Logger logger = LogManager.getLogger(AuthManager.class);
 
     static {
-        Injector injector = Guice.createInjector(new AppModule());
-
-        // Specify the class you want to inject
-        injector.getInstance(AppModule.class).bindDAO(UserModel.class);
-
-        // Injecting the DAO
-        userDao = injector.getInstance(new Key<GenericDAOI<UserModel>>() {});
+        /*
+         * Instantiation of the GenericDAO object.
+         * In this case, dependency injection is not used because there's no need to.
+         * It would overcomplicate the code, not representing an important gain.
+         */
+        userDao = new GenericDAO<>();
     }
 
-    public static UserModel login(String username, String password) {
+    /**
+     * Authenticate the user in the database with the provided UUID and password
+     * @param uuid UUID of the user
+     * @param password password of the user
+     * @return UserModel object if the user was successfully authenticated, null otherwise
+     */
+    public static UserModel login(UUID uuid, String password) {
+        logger.atInfo().log("User {} is trying to login", uuid);
         password = hashString(password); // Hash the password
         try {
-            UserModel userModel = (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findAny().orElse(null);
+            UserModel userModel = userDao.getById(UserModel.class, uuid);
+            // Check if the user exists and the password is correct
             if (userModel != null && userModel.getPassword().equals(password)) {
+                logger.atInfo().log("User {} successfully logged in", uuid);
                 return userModel;
             }
         } catch (Exception e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error during login - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("Error during login. User: {}", uuid);
         }
+        logger.atInfo().log("User {} failed to login", uuid);
         return null;
     }
 
@@ -55,10 +61,18 @@ public class AuthManager {
      * @return true if the user was successfully registered, false otherwise
      */
     public static boolean register(UserModel userModel) {
+        logger.atInfo().log("User {} is trying to register", userModel.getUuid());
         try {
-            return userDao.save(userModel) != null;
+            userModel.setPassword(hashString(userModel.getPassword()));
+            if(userDao.save(userModel) != null){
+                logger.atInfo().log("User {} successfully registered", userModel.getUuid());
+                return true;
+            } else {
+                logger.atError().log("User {} didn't registered successfully", userModel.getUuid());
+                return false;
+            }
         } catch (Exception e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error during register - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("Error during register. User: {}", userModel.getUuid());
             return false;
         }
     }
@@ -91,17 +105,25 @@ public class AuthManager {
 
     /**
      * Change the user's password in the database
-     * @param uuid UUID of the user
+     *
+     * @param uuid     UUID of the user
      * @param password new password
      * @return true if the password was successfully changed, false otherwise
      */
     public static boolean changePassword(UUID uuid, String password) {
+        logger.atInfo().log("User {} is trying to change password", uuid);
         try {
             UserModel userModel = userDao.getById(UserModel.class, uuid);
-            userModel.setPassword(password);
-            return userDao.update(userModel) != null;
+            userModel.setPassword(hashString(password));
+            if (userDao.update(userModel) != null) {
+                logger.atInfo().log("User {} successfully changed password", uuid);
+                return true;
+            } else {
+                logger.atError().log("User {} didn't change password successfully", uuid);
+                return false;
+            }
         } catch (Exception e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error during changePassword - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("Error during change password. User: {}", uuid);
             return false;
         }
     }
@@ -112,11 +134,17 @@ public class AuthManager {
      * @return UserModel object if the user exists, null otherwise
      */
     public static UserModel getUserByUsername(String username) {
-        return (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findAny().orElse(null);
+        logger.atInfo().log("Searching for user with username \"{}\"", username);
+        return (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findFirst().orElse(null);
     }
 
 
-    public static String hashString(String string){
+    /**
+     * Hashes a string using the SHA-256 algorithm
+     * @param string string to be hashed
+     * @return hashed string
+     */
+    public static String hashString(String string) {
         try {
             // Configure the hash algorithm to be used
             MessageDigest algorithm = MessageDigest.getInstance("SHA-256");

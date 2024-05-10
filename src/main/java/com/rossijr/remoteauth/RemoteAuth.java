@@ -11,6 +11,8 @@ import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.messages.ParameterBuilder;
 import com.rossijr.remoteauth.config.messages.Parameters;
 import com.rossijr.remoteauth.models.SessionModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ import java.util.*;
  * <p>It also contains the active sessions map, spawn location, and other important variables.</p>
  */
 public final class RemoteAuth extends JavaPlugin implements Listener {
+    private static final Logger logger = LogManager.getLogger(RemoteAuth.class);
     /**
      * Map of active sessions, where the key is the player's UUID and the value is the session model
      */
@@ -83,22 +86,33 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     public void onEnable() {
         // Get the config file
         getConfig().options().copyDefaults();
+        saveDefaultConfig();
 
-        // Initialize the messages and database
-        Settings.init(getConfig());
+        if(getConfig().getBoolean("db.ready_to_connect")) {
+            // Initialize the messages and database
+            try {
+                Settings.init(getConfig());
+            } catch (Exception e) {
+                System.out.println("RemoteAuth --/ERROR/-- Error initializing messages and database");
+                Bukkit.shutdown();
+            }
+        } else {
+            System.out.println("RemoteAuth --/ERROR/-- Plugin is disabled in the configuration file");
+        }
 
         /// Checks the spawn to see if it is set
         try {
             // Check if the spawn is set
-            spawnSet = getConfig().getString("spawn.world") != null;
+            spawnSet = getConfig().getBoolean("spawn.spawn_set");
+            logger.atInfo().log("Spawn set: {}", spawnSet);
         } catch (Exception e) {
             spawnSet = false;
         }
         /// If the spawn is set, load the spawn location
         if (spawnSet) {
             try {
-                setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.x"),
-                        getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
+                setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.X"),
+                        getConfig().getInt("spawn.Y"), getConfig().getInt("spawn.Z"),
                         Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
             } catch (NullPointerException e) {
                 System.out.println("Error loading spawn location from configuration file");
@@ -107,9 +121,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         }
 
         /// Loads the auto messages configuration
-        autoMessages.put("automatic_messages.alert.force_logout_30s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_30s")).toString()));
-        autoMessages.put("automatic_messages.alert.force_logout_15s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_15s")).toString()));
-        autoMessages.put("automatic_messages.alert.force_logout_5s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_5s")).toString()));
+        autoMessages.put("automatic_messages.alert.force_logout_30s", getConfig().getBoolean("automatic_messages.alert.force_logout_30s"));
+        autoMessages.put("automatic_messages.alert.force_logout_15s", getConfig().getBoolean("automatic_messages.alert.force_logout_15s"));
+        autoMessages.put("automatic_messages.alert.force_logout_5s", getConfig().getBoolean("automatic_messages.alert.force_logout_5s"));
 
 
         // Register the commands
@@ -165,9 +179,10 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     private void setConfigSpawn(Location location) throws NullPointerException {
         try {
             getConfig().options().copyDefaults();
-            getConfig().set("spawn.x", location.getBlockX());
-            getConfig().set("spawn.y", location.getBlockY());
-            getConfig().set("spawn.z", location.getBlockZ());
+            getConfig().set("spawn.spawn_set", true);
+            getConfig().set("spawn.X", location.getBlockX());
+            getConfig().set("spawn.Y", location.getBlockY());
+            getConfig().set("spawn.Z", location.getBlockZ());
             getConfig().set("spawn.yaw", location.getYaw());
             getConfig().set("spawn.pitch", location.getPitch());
             getConfig().set("spawn.world", Objects.requireNonNull(location.getWorld()).getName());

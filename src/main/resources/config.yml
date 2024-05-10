@@ -1,14 +1,9 @@
-
-
-
-
-
 # Here you can find the new configuration file of RemoteAuth
-
 
 # DATABASE CONFIGURATION
 ## . In this section you're able  to configure the database connection.
 ## . Following you're going to see the definition of each parameter:
+### - ready_to_connect: A boolean that indicates if the plugin is ready to try to connect to the database.
 ### - dbms: The database management system that you're using. The supported values are:
 #### . 'mysql'- For a MySQL database management system
 #### . 'postgresql'- For a PostgreSQL database management system
@@ -19,25 +14,20 @@
 ### - database: The name of the database that you're using (in case of PostgreSQL, be sure to put the schema the database is in as the default schema)
 ### - username: The username of the database (usually 'root' for MySQL and 'postgres' for PostgreSQL)
 ### - password: The password of the database
-### - username_column: The name of the column that contains the username in the table (it is not a mandatory field, but if you don't put it, the plugin will use the default column 'username')
-### - password_column: The name of the column that contains the password in the table (it is not a mandatory field, but if you don't put it, the plugin will use the default column 'password')
-### - user_table: The name of the table that contains the users (it is not a mandatory field, but if you don't put it, the plugin will use the default table 'users')
 db:
+  ready_to_connect: False
   dbms: 'postgresql'
   host: 'localhost'
-  port: 5431
-  database: 'RemoteAuthTest'
+  port: 5432
+  database: 'RemoteAuth'
   username: 'postgres'
-  password: 'rossi'
-  username_column: 'username'
-  password_column: 'password'
-  user_table: 'users'
-
+  password: 'postgres'
 
 # SPAWN CONFIGURATION
 ## . In this section you're able to configure the spawn point of the server.
 ## . You can either manually set the spawn point or use the command /rasetspawn to set it (the second option is more recommended)
 ## . Following you're going to see the definition of each parameter:
+### - spawn_set: A boolean that indicates if the spawn point is set or not.
 ### - X: The X coordinate of the spawn point (Integer)
 ### - Y: The Y coordinate of the spawn point (Integer)
 ### - Z: The Z coordinate of the spawn point (Integer)
@@ -45,6 +35,7 @@ db:
 ### - yaw: The yaw of the spawn point (Float)
 ### - world: The world of the spawn point
 spawn:
+  spawn_set: False
   X: 0
   Y: 0
   Z: 0

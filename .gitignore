@@ -111,3 +111,6 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# IntelliJ project files
+src/main/resources/config.yml

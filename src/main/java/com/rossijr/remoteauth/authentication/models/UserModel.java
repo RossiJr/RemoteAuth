@@ -1,16 +1,14 @@
 package com.rossijr.remoteauth.authentication.models;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
 /**
  * UserModel class to represent the user in the database and in the application
  */
+@Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "uuid"),})
 public class UserModel {
@@ -19,7 +17,7 @@ public class UserModel {
     private UUID uuid;
     @Column(name = "username", unique = true, nullable = false)
     private String username;
-    @Column(name = "password", unique = false, nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     public UserModel(){

@@ -27,6 +27,15 @@
     - [Commands](#commands)
 - [Contact](#contact)
 
+<div>
+
+<p style="color: red; font-size: large; font-family: 'Cambria Math',serif; font-weight: bold"> IMPORTANT NOTE </p>
+
+<p style="font-family: 'Cambria',serif; font-size: medium; color: #ff6e64">The configuration of the database connection is required to use the plugin, and it was recently altered to support a wider range of Database Manager Systems.
+<br>Please, make sure to configure the database connection properly before starting the server.</p>
+
+</div>
+
 ## Why to use RemoteAuth? <a name="why-to-use-remoteauth"></a>
 
 RemoteAuth is a simple and easy to use plugin that allows you to authenticate users in your application using a remote
@@ -48,7 +57,7 @@ single server.
 ### Available DBMSs <a name="available-dbmss"></a>
 
 - [x] PostgresSQL
-- [ ] MySQL **(NOT IMPLEMENTED YET)**
+- [x] MySQL 
 - [ ] SQL Server **(NOT IMPLEMENTED YET)**
 - [ ] SQLite **(NOT IMPLEMENTED YET)**
 - [ ] Oracle **(NOT IMPLEMENTED YET)**
@@ -69,27 +78,24 @@ Make sure to configure properly the database connection and the spawn point (opt
 
 #### Database Configuration <a name="database-configuration"></a>
 
-To configure RemoteAuth, you need to create a file in the plugin directory `/plugins/RemoteAuth/db.properties`. This
-file
-should contain the following properties, as shown in the example below:
+To configure RemoteAuth, you need to open the `config.yml` file inside the `/plugins/RemoteAuth` folder. In this file,
+you can configure the database connection considering the following parameters:
 
-```properties
+```yaml
 # THOSE ARE THE DEFAULT VALUES, YOU MUST CHANGE TO YOUR OWN VALUES #
 # REQUIRED FIELDS
-db.dbms=postgresql
-db.host=localhost
-db.port=5432
-db.database=RemoteAuthTest
-db.username=postgres
-db.password=postgres
-# OPTIONAL FIELDS
-db.user_schema=public
-db.user_table=users
-db.uuid_column=uuid
-db.username_column=username
-db.password_column=password
+db:
+  ready_to_connect: False
+  dbms: 'postgresql'
+  host: 'localhost'
+  port: 5432
+  database: 'RemoteAuth'
+  username: 'postgres'
+  password: 'postgres'
 ```
 
+- `db.ready_to_connect` - This parameter is used to check if the plugin is ready to connect to the database. If it is set
+  to `False`, the plugin will not connect to the database. **(REQUIRED)**
 - `db.dbms` - The DBMS you are using. Use the one of the following parameters: **(REQUIRED)**
     - PostgresSQL: `postgresql`
 - `db.host` - The host of the database. **(REQUIRED)**
@@ -97,15 +103,8 @@ db.password_column=password
 - `db.database` - The name of the database you are using. **(REQUIRED)**
 - `db.username` - The username used to connect to the database. **(REQUIRED)**
 - `db.password` - The password used to connect to the database. **(REQUIRED)**
-- `db.user_schema` - The schema where the user's table is located. **(OPTIONAL)**
-- `db.user_table` - The table where the user's data is stored. **(OPTIONAL)**
-- `db.uuid_column` - The column where the user's UUID is stored. **(OPTIONAL)**
-- `db.username_column` - The column where the user's username is stored. **(OPTIONAL)**
-- `db.password_column` - The column where the user's password is stored. **(OPTIONAL)**
 
-> - **In case of no optional fields set, the plugin will use the default values (the ones shown in the example above).**
-> - **If the file doesn't exist or any error has happened during the connection to the database, the plugin will shut
-    the server down.**
+> **Make sure to use the correct values for your database connection. Otherwise, the plugin will be shut down during the initialization process.**
 
 #### Spawn Configuration <a name="spawn-configuration"></a>
 
@@ -133,6 +132,7 @@ the `/plugin/RemoteAuth/config.yml` file is empty.**
     - To define the spawn point for the first time you must use the following format:
         - ```yaml
           spawn:
+            spawn_set: False
             X: 0
             Y: 0
             Z: 0
@@ -141,6 +141,8 @@ the `/plugin/RemoteAuth/config.yml` file is empty.**
             world: world
 
     - To change it, you can use the same format, changing the values.
+  > **Make sure to also use the `spawn_set` parameter to check if the spawn point is set. If it is set to `False`, the player won't be teleported when logging in.**
+  > 
   > **Make sure to use the same format as the example above. Otherwise, it will not work!!**
 
 #### Messages Configuration <a name="messages-configuration"></a>

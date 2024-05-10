@@ -11,6 +11,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 
 public class LoginCommand implements CommandExecutor {
     private final RemoteAuth plugin;
@@ -27,11 +29,11 @@ public class LoginCommand implements CommandExecutor {
             if (args.length == 1) {
                 // Checks if the player is logged in
                 if (!plugin.getActiveSessions().containsKey(player.getUniqueId())) {
-                    String username = sender.getName();
+                    UUID uuid = ((Player) sender).getUniqueId();
                     String password = args[0];
                     try{
                         // Checks if the username and password are correct
-                        UserModel user = AuthManager.login(username, password);
+                        UserModel user = AuthManager.login(uuid, password);
                         // If the user is correct, an UserModel object will be created and
                         // the user will be added to the active sessions
                         if(user != null){

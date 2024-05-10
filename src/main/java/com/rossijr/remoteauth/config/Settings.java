@@ -34,8 +34,11 @@ public class Settings {
      */
     private static boolean anyMessageLoaded = false;
 
-
-    public static void init(FileConfiguration config) {
+    /**
+     * Method to initialize specific plugin settings and configurations
+     * @param config FileConfiguration object with the plugin configurations
+     */
+    public static void init(FileConfiguration config) throws NullPointerException {
         // Loads the messages
         generateMessages();
 
@@ -44,21 +47,16 @@ public class Settings {
     }
 
 
-    public static Properties loadBdConfigurations(FileConfiguration configuration) {
+    public static Properties loadBdConfigurations(FileConfiguration configuration) throws NullPointerException {
         Properties properties = new Properties();
 
-        properties.setProperty(Environment.JAKARTA_JDBC_DRIVER, getDatabaseDriver((Objects.requireNonNull(configuration.getString("db.dbms")))));
-        properties.setProperty(Environment.JAKARTA_JDBC_URL, "jdbc:" +
-                        configuration.getString("db.dbms") + "://" + configuration.getString("db.host") +
-                        ":" + configuration.getString("db.port") + "/" + configuration.getString("db.database"));
-        properties.setProperty(Environment.JAKARTA_JDBC_USER, configuration.getString("db.username"));
-        properties.setProperty(Environment.JAKARTA_JDBC_PASSWORD, configuration.getString("db.password"));
-        properties.setProperty(Environment.DIALECT, getDatabaseDialect((Objects.requireNonNull(configuration.getString("db.dbms")))));
-        properties.setProperty("db.user_table", configuration.getString("db.user_table"));
-        properties.setProperty("db.uuid_column", configuration.getString("db.uuid_column"));
-        properties.setProperty("db.username_column", configuration.getString("db.username_column"));
-        properties.setProperty("db.password_column", configuration.getString("db.password_column"));
-
+            properties.setProperty(Environment.JAKARTA_JDBC_DRIVER, getDatabaseDriver((Objects.requireNonNull(configuration.getString("db.dbms")))));
+            properties.setProperty(Environment.JAKARTA_JDBC_URL, "jdbc:" +
+                    configuration.getString("db.dbms") + "://" + configuration.getString("db.host") +
+                    ":" + configuration.getString("db.port") + "/" + configuration.getString("db.database"));
+            properties.setProperty(Environment.JAKARTA_JDBC_USER, configuration.getString("db.username"));
+            properties.setProperty(Environment.JAKARTA_JDBC_PASSWORD, configuration.getString("db.password"));
+            properties.setProperty(Environment.DIALECT, getDatabaseDialect((Objects.requireNonNull(configuration.getString("db.dbms")))));
         Settings.dbProperties = properties;
         return properties;
     }
