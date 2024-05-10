@@ -1,0 +1,66 @@
+
+
+
+
+
+# Here you can find the new configuration file of RemoteAuth
+
+
+# DATABASE CONFIGURATION
+## . In this section you're able  to configure the database connection.
+## . Following you're going to see the definition of each parameter:
+### - dbms: The database management system that you're using. The supported values are:
+#### . 'mysql'- For a MySQL database management system
+#### . 'postgresql'- For a PostgreSQL database management system
+### - host: The host of the database (you can use a localhost or a remote host,
+###     but in remote hosts an SSH option is not implement yet,
+###     feel free to contact the developer to implement it personalized to you)
+### - port: The port of the database (usually 3306 for MySQL and 5432 for PostgreSQL)
+### - database: The name of the database that you're using (in case of PostgreSQL, be sure to put the schema the database is in as the default schema)
+### - username: The username of the database (usually 'root' for MySQL and 'postgres' for PostgreSQL)
+### - password: The password of the database
+### - username_column: The name of the column that contains the username in the table (it is not a mandatory field, but if you don't put it, the plugin will use the default column 'username')
+### - password_column: The name of the column that contains the password in the table (it is not a mandatory field, but if you don't put it, the plugin will use the default column 'password')
+### - user_table: The name of the table that contains the users (it is not a mandatory field, but if you don't put it, the plugin will use the default table 'users')
+db:
+  dbms: 'postgresql'
+  host: 'localhost'
+  port: 5431
+  database: 'RemoteAuthTest'
+  username: 'postgres'
+  password: 'rossi'
+  username_column: 'username'
+  password_column: 'password'
+  user_table: 'users'
+
+
+# SPAWN CONFIGURATION
+## . In this section you're able to configure the spawn point of the server.
+## . You can either manually set the spawn point or use the command /rasetspawn to set it (the second option is more recommended)
+## . Following you're going to see the definition of each parameter:
+### - X: The X coordinate of the spawn point (Integer)
+### - Y: The Y coordinate of the spawn point (Integer)
+### - Z: The Z coordinate of the spawn point (Integer)
+### - pitch: The pitch of the spawn point (Float)
+### - yaw: The yaw of the spawn point (Float)
+### - world: The world of the spawn point
+spawn:
+  X: 0
+  Y: 0
+  Z: 0
+  pitch: 0.0
+  yaw: 0.0
+  world: 'world'
+
+
+#AUTOMATIC MESSAGES CONFIGURATION
+## . In this section you're able to configure the automatic messages that the plugin sends to the player.
+## . You can change the default message to be sent to the player in the `messages.properties` file,
+## putting the value you want in the key `messages.alert.pre_login_time_out`. Go to the readme.md file to see how to do it.
+## . Currently, the plugin has three automatic messages that are sent to the player it is in the login process:
+### - force_logout_Xs: The message that is sent to the player when the player is going to be forced to log out in X seconds
+automatic_messages:
+  alert:
+    force_logout_30s: true
+    force_logout_15s: true
+    force_logout_5s: true

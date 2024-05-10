@@ -1,14 +1,15 @@
 package com.rossijr.remoteauth.authentication;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.rossijr.remoteauth.authentication.models.UserModel;
-import com.rossijr.remoteauth.db.GenericDAO;
-import com.rossijr.remoteauth.db.Utils;
-import com.rossijr.remoteauth.db.annotations.model_annotation.Column;
-import com.rossijr.remoteauth.db.annotations.model_annotation.Table;
-import com.rossijr.remoteauth.db.config.DbConfig;
+import com.rossijr.remoteauth.db.GenericDAOI;
+import com.rossijr.remoteauth.db.dependencyinjection.AppModule;
 
-import java.sql.SQLException;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
@@ -16,6 +17,7 @@ import java.util.UUID;
  * <p>It is responsible for authenticate users, register them and update any user data. </p>
  */
 public class AuthManager {
+    private static GenericDAOI<UserModel> userDao;
     /**
      * Login method to authenticate the user. Refactored to use the GenericDAO class.
      *
@@ -23,34 +25,24 @@ public class AuthManager {
      * @param password password of the user (NOT HASHED)
      * @return UserModel object if the user is authenticated, null otherwise
      */
+
+    static {
+        Injector injector = Guice.createInjector(new AppModule());
+
+        // Specify the class you want to inject
+        injector.getInstance(AppModule.class).bindDAO(UserModel.class);
+
+        // Injecting the DAO
+        userDao = injector.getInstance(new Key<GenericDAOI<UserModel>>() {});
+    }
+
     public static UserModel login(String username, String password) {
-        password = Utils.hashString(password); // Hash the password
+        password = hashString(password); // Hash the password
         try {
-            // Create a new GenericDAO object to manipulate the UserModel class
-            GenericDAO<UserModel> dao = new GenericDAO<>(DbConfig.getDbmsFactory(), UserModel.class);
-
-            // Get the table name from the UserModel class
-            String tableName = DbConfig.getValue(UserModel.class.getAnnotation(Table.class).key());
-
-            // Get the username column name from the UserModel class. Found via annotations with the field key in the configuration file
-            String usernameColumn = DbConfig.getValue(Arrays.stream(UserModel.class.getDeclaredFields())
-                    .filter(field -> field.getName().equals("username"))
-                    .findFirst()
-                    .orElseThrow()
-                    .getAnnotation(Column.class)
-                    .key());
-
-            // Get the password column name from the UserModel class. Found via annotations with the field key in the configuration file
-            String passwordColumn = DbConfig.getValue(Arrays.stream(UserModel.class.getDeclaredFields())
-                    .filter(field -> field.getName().equals("password"))
-                    .findFirst()
-                    .orElseThrow()
-                    .getAnnotation(Column.class)
-                    .key());
-
-            // Perform the query to check if the user's credentials are correct. The query is built as 'SELECT * FROM users WHERE username = ? AND password = ?
-            return dao.query(String.format("SELECT * FROM %s WHERE %s = ? AND %s = ?",
-                    tableName, usernameColumn, passwordColumn), username, password).stream().findAny().orElseThrow();
+            UserModel userModel = (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findAny().orElse(null);
+            if (userModel != null && userModel.getPassword().equals(password)) {
+                return userModel;
+            }
         } catch (Exception e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during login - class {" + AuthManager.class.getName() + "}");
         }
@@ -64,10 +56,10 @@ public class AuthManager {
      */
     public static boolean register(UserModel userModel) {
         try {
-            GenericDAO<UserModel> dao = new GenericDAO<>(DbConfig.getDbmsFactory(), UserModel.class);
-            return dao.insert(userModel) != null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return userDao.save(userModel) != null;
+        } catch (Exception e) {
+            System.out.println("RemoteAuth --/ERROR/-- Error during register - class {" + AuthManager.class.getName() + "}");
+            return false;
         }
     }
 
@@ -79,8 +71,7 @@ public class AuthManager {
      */
     private static boolean uuidExists(UUID uuid) {
         try {
-            GenericDAO<UserModel> dao = new GenericDAO<>(DbConfig.getDbmsFactory(), UserModel.class);
-            return dao.getById(uuid) != null;
+            return userDao.getById(UserModel.class, uuid) != null;
         } catch (Exception e) {
             System.out.println("RemoteAuth --/ERROR/-- Error during uuidExists - class {" + AuthManager.class.getName() + "}");
         }
@@ -106,12 +97,12 @@ public class AuthManager {
      */
     public static boolean changePassword(UUID uuid, String password) {
         try {
-            GenericDAO<UserModel> dao = new GenericDAO<>(DbConfig.getDbmsFactory(), UserModel.class);
-            UserModel userModel = dao.getById(uuid);
+            UserModel userModel = userDao.getById(UserModel.class, uuid);
             userModel.setPassword(password);
-            return dao.update(userModel) != null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return userDao.update(userModel) != null;
+        } catch (Exception e) {
+            System.out.println("RemoteAuth --/ERROR/-- Error during changePassword - class {" + AuthManager.class.getName() + "}");
+            return false;
         }
     }
 
@@ -121,7 +112,29 @@ public class AuthManager {
      * @return UserModel object if the user exists, null otherwise
      */
     public static UserModel getUserByUsername(String username) {
-        GenericDAO<UserModel> dao = new GenericDAO<>(DbConfig.getDbmsFactory(), UserModel.class);
-        return dao.getByColumn("username", username).stream().findAny().orElse(null);
+        return (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findAny().orElse(null);
+    }
+
+
+    public static String hashString(String string){
+        try {
+            // Configure the hash algorithm to be used
+            MessageDigest algorithm = MessageDigest.getInstance("SHA-256");
+            // Hash the string with UTF-8 encoding
+            byte[] messageDigest = algorithm.digest(string.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : messageDigest) {
+                // Convert the byte to hexadecimal to string | 0xff & b -> mask to obtain only the 8 most significant bits
+                String hex = Integer.toHexString(0xff & b);
+                // If the length hex is equal to 1, append 0 to the string
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("RemoteAuth --/ERROR/-- Error during hashing - class {" + AuthManager.class.getName() + "}");
+            return null;
+
+        }
     }
 }

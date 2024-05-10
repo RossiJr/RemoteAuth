@@ -4,7 +4,6 @@ import com.rossijr.remoteauth.authentication.AuthManager;
 import com.rossijr.remoteauth.authentication.models.UserModel;
 import com.rossijr.remoteauth.config.Settings;
 import com.rossijr.remoteauth.config.messages.DefaultMessages;
-import com.rossijr.remoteauth.db.DbConnection;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

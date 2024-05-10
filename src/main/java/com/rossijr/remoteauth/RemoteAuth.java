@@ -10,7 +10,6 @@ import com.rossijr.remoteauth.config.Settings;
 import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.messages.ParameterBuilder;
 import com.rossijr.remoteauth.config.messages.Parameters;
-import com.rossijr.remoteauth.db.config.DbConfig;
 import com.rossijr.remoteauth.models.SessionModel;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +34,8 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      */
     private Map<UUID, SessionModel> activeSessions;
     private Map<UUID, List<Task>> taskMap;
+
+    private final Map<String, Boolean> autoMessages = new HashMap<>();
 
     /**
      * If the plugin is up, used to prevent players from joining before the plugin is ready
@@ -80,11 +81,36 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        // Verify if exists the db.properties file or if is it properly configured
-        if (!DbConfig.isDbConfigured()) {
-            Bukkit.shutdown();
-            throw new RuntimeException("The db.properties file is not configured properly, or it's configured in the wrong place.");
+        // Get the config file
+        getConfig().options().copyDefaults();
+
+        // Initialize the messages and database
+        Settings.init(getConfig());
+
+        /// Checks the spawn to see if it is set
+        try {
+            // Check if the spawn is set
+            spawnSet = getConfig().getString("spawn.world") != null;
+        } catch (Exception e) {
+            spawnSet = false;
         }
+        /// If the spawn is set, load the spawn location
+        if (spawnSet) {
+            try {
+                setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.x"),
+                        getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
+                        Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
+            } catch (NullPointerException e) {
+                System.out.println("Error loading spawn location from configuration file");
+                spawnSet = false;
+            }
+        }
+
+        /// Loads the auto messages configuration
+        autoMessages.put("automatic_messages.alert.force_logout_30s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_30s")).toString()));
+        autoMessages.put("automatic_messages.alert.force_logout_15s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_15s")).toString()));
+        autoMessages.put("automatic_messages.alert.force_logout_5s", Boolean.getBoolean(Objects.requireNonNull(getConfig().get("automatic_messages.alert.force_logout_5s")).toString()));
+
 
         // Register the commands
         try {
@@ -101,29 +127,6 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
         // Initialize the task map, guaranteeing that it is not null and empty
         taskMap = new HashMap<>();
-
-        // Load the configuration
-        getConfig().options().copyDefaults();
-        try {
-            // Check if the spawn is set
-            spawnSet = getConfig().getString("spawn.world") != null;
-        } catch (Exception e) {
-            spawnSet = false;
-        }
-
-        // If the spawn is set, load spawn location
-        if (spawnSet) {
-            try {
-                setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.x"),
-                        getConfig().getInt("spawn.y"), getConfig().getInt("spawn.z"),
-                        Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
-            } catch (NullPointerException e) {
-                System.out.println("Error loading spawn location from configuration file");
-                spawnSet = false;
-            }
-        }
-        // Load the database driver
-//        StartupConfig.bdStartup("org.postgresql.Driver");
 
         // Use this class to register events
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -187,23 +190,28 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        BukkitTask taskPreKicking = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
-                .addParameter(Parameters.TIME, "15")
-                .build())), 300);
-        addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking, true));
+        if(autoMessages.get("automatic_messages.alert.force_logout_5s")) {
+            BukkitTask taskPreKicking2 = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
+                    .addParameter(Parameters.TIME, "5")
+                    .build())), 500);
+            addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking2, true));
+        }
 
-        BukkitTask taskPreKicking2 = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
-                .addParameter(Parameters.TIME, "5")
-                .build())), 500);
-        addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking2, true));
+        if(autoMessages.get("automatic_messages.alert.force_logout_15s")) {
+            BukkitTask taskPreKicking = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
+                    .addParameter(Parameters.TIME, "15")
+                    .build())), 300);
+            addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking, true));
+        }
 
-        BukkitTask taskKickIfNotLoggedIn = Bukkit.getScheduler().runTaskLater(this, () -> {
-            if (!isPlayerLogged(e.getPlayer().getUniqueId())) {
-                e.getPlayer().kickPlayer(Settings.getMessage(DefaultMessages.LOGIN_TIME_OUT_ALERT));
-            }
-        }, 600);
-        addTask(e.getPlayer().getUniqueId(), new Task(taskKickIfNotLoggedIn, true));
-
+        if(autoMessages.get("automatic_messages.alert.force_logout_30s")) {
+            BukkitTask taskKickIfNotLoggedIn = Bukkit.getScheduler().runTaskLater(this, () -> {
+                if (!isPlayerLogged(e.getPlayer().getUniqueId())) {
+                    e.getPlayer().kickPlayer(Settings.getMessage(DefaultMessages.LOGIN_TIME_OUT_ALERT));
+                }
+            }, 600);
+            addTask(e.getPlayer().getUniqueId(), new Task(taskKickIfNotLoggedIn, true));
+        }
         // If the spawn is set, teleport the player to the spawn location
         if (spawnSet)
             e.getPlayer().teleport(new Location(Bukkit.getWorld(spawnWorld), spawnCoordinates[0], spawnCoordinates[1], spawnCoordinates[2],
