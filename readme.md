@@ -58,9 +58,9 @@ single server.
 
 - [x] PostgresSQL
 - [x] MySQL 
-- [ ] SQL Server **(NOT IMPLEMENTED YET)**
-- [ ] SQLite **(NOT IMPLEMENTED YET)**
-- [ ] Oracle **(NOT IMPLEMENTED YET)**
+- [x] SQL Server
+- [x] SQLite **(NOT IMPLEMENTED YET)**
+- [x] Oracle
 - [ ] MariaDB **(NOT IMPLEMENTED YET)**
 - [ ] MongoDB **(NOT IMPLEMENTED YET)**
 

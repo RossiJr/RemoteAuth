@@ -7,6 +7,9 @@
 ### - dbms: The database management system that you're using. The supported values are:
 #### . 'mysql'- For a MySQL database management system
 #### . 'postgresql'- For a PostgreSQL database management system
+#### . 'sqlserver'- For a SQL Server database management system
+#### . 'oracle'- For an Oracle database management system
+#### . 'sqlite'- For a SQLite database management system
 ### - host: The host of the database (you can use a localhost or a remote host,
 ###     but in remote hosts an SSH option is not implement yet,
 ###     feel free to contact the developer to implement it personalized to you)

@@ -62,19 +62,33 @@ public class Settings {
     }
 
     private static String getDatabaseDriver(String dbms){
-        if (dbms.equals("mysql")) {
-            return "com.mysql.cj.jdbc.Driver";
-        } else if (dbms.equals("postgresql")) {
-            return "org.postgresql.Driver";
+        switch (dbms) {
+            case "mysql":
+                return "com.mysql.cj.jdbc.Driver";
+            case "postgresql":
+                return "org.postgresql.Driver";
+            case "sqlserver":
+                return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+            case "oracle":
+                return "oracle.jdbc.driver.OracleDriver";
+            case "sqlite":
+                return "org.sqlite.JDBC";
         }
         return null;
     }
 
     private static String getDatabaseDialect(String dbms){
-        if (dbms.equals("mysql")) {
-            return "org.hibernate.dialect.MySQLDialect";
-        } else if (dbms.equals("postgresql")) {
-            return "org.hibernate.dialect.PostgreSQLDialect";
+        switch (dbms) {
+            case "mysql":
+                return "org.hibernate.dialect.MySQLDialect";
+            case "postgresql":
+                return "org.hibernate.dialect.PostgreSQLDialect";
+            case "sqlserver":
+                return "org.hibernate.dialect.SQLServerDialect";
+            case "oracle":
+                return "org.hibernate.dialect.OracleDialect";
+            case "sqlite":
+                return "org.hibernate.dialect.SQLiteDialect";
         }
         return null;
     }
