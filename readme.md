@@ -74,7 +74,7 @@ To download RemoteAuth, you can use this [link](https://www.spigotmc.org/resourc
 download the latest version of the plugin. After
 downloading the jar file, you can add it to your server's `/plugins` folder.
 
-Make sure to configure properly the database connection and the spawn point (optional) before starting the server.
+Make sure to configure properly the required and optional properties before starting the server.
 
 #### Database Configuration <a name="database-configuration"></a>
 
@@ -115,7 +115,7 @@ If you want to use the spawn point feature, you must configure it with one of th
 want to use it, you can skip this step.
 
 > **If you don't want the player being teleported when logging in, you must make sure the `spawn` object in
-the `/plugin/RemoteAuth/config.yml` file is empty.**
+the `/plugin/RemoteAuth/config.yml` file has the `spawn_set` property set as `True`.**
 
 ##### 1. First option - With command (**RECOMMENDED**) <a name="db-config-first-option"></a>
 
