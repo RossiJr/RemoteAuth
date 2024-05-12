@@ -1,5 +1,6 @@
 package com.rossijr.remoteauth.config;
 
+import com.rossijr.remoteauth.RemoteAuth;
 import com.rossijr.remoteauth.config.messages.DefaultMessages;
 import com.rossijr.remoteauth.config.messages.Parameters;
 import com.rossijr.remoteauth.db.Configuration;
@@ -44,10 +45,19 @@ public class Settings {
 
         // Load the database configurations
         Configuration.init(loadBdConfigurations(config));
+
+        // Load the log configurations
+        LogConfigurator.init(loadLogConfigurations(config));
+    }
+
+    private static Properties loadLogConfigurations(FileConfiguration configuration) {
+        Properties properties = new Properties();
+        properties.setProperty("log.level", configuration.getString("log.level", "OFF"));
+        return properties;
     }
 
 
-    public static Properties loadBdConfigurations(FileConfiguration configuration) throws NullPointerException {
+    private static Properties loadBdConfigurations(FileConfiguration configuration) throws NullPointerException {
         Properties properties = new Properties();
 
             properties.setProperty(Environment.JAKARTA_JDBC_DRIVER, getDatabaseDriver((Objects.requireNonNull(configuration.getString("db.dbms")))));
@@ -134,9 +144,9 @@ public class Settings {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println("RemoteAuth --/ERROR/-- No messages file found");
+            RemoteAuth.logger.atWarn().log("[RemoteAuth] - MainThread --o-o-- Messages file not found");
         } catch (Exception e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error loading messages file");
+            RemoteAuth.logger.atError().log("[RemoteAuth] - MainThread --o-o-- Error during messages file loading");
         }
     }
 

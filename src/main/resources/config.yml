@@ -4,10 +4,9 @@
 ## . In this section you're able  to configure the database connection.
 ## . Following you're going to see the definition of each parameter:
 ### - ready_to_connect: A boolean that indicates if the plugin is ready to try to connect to the database.
-### - dbms: The database management system that you're using. The supported values are:
+### - dbms: The database management system that you're using. Note that the recommended DBMS are PostgreSQL and MySQL. The supported values are:
 #### . 'mysql'- For a MySQL database management system
 #### . 'postgresql'- For a PostgreSQL database management system
-#### . 'sqlserver'- For a SQL Server database management system
 #### . 'oracle'- For an Oracle database management system
 #### . 'sqlite'- For a SQLite database management system
 ### - host: The host of the database (you can use a localhost or a remote host,
@@ -58,3 +57,14 @@ automatic_messages:
     force_logout_30s: true
     force_logout_15s: true
     force_logout_5s: true
+
+
+# LOG CONFIGURATION
+## . In this section you're able to configure the log of the plugin.
+## . Following you're going to see the definition of each parameter:
+### - level: The level of the log. Note that the default level is WARN, which means only errors and warnings. The supported values are:
+#### . 'INFO'- For information logs. This includes an information about the actions performed, warnings and errors. Example: player logging in
+#### . 'WARN'- For warning logs. This includes warning and internal errors. Example or warning: player logging in with wrong password
+#### . 'OFF'- For no logs
+log:
+  level: 'WARN'

@@ -31,7 +31,7 @@ import java.util.*;
  * <p>It also contains the active sessions map, spawn location, and other important variables.</p>
  */
 public final class RemoteAuth extends JavaPlugin implements Listener {
-    private static final Logger logger = LogManager.getLogger(RemoteAuth.class);
+    public static final Logger logger = LogManager.getLogger(RemoteAuth.class);
     /**
      * Map of active sessions, where the key is the player's UUID and the value is the session model
      */
@@ -88,35 +88,34 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         getConfig().options().copyDefaults();
         saveDefaultConfig();
 
-        if(getConfig().getBoolean("db.ready_to_connect")) {
-            // Initialize the messages and database
+        if (getConfig().getBoolean("db.ready_to_connect")) {
+            // Initialize the messages, database and logs
             try {
                 Settings.init(getConfig());
             } catch (Exception e) {
-                System.out.println("RemoteAuth --/ERROR/-- Error initializing messages and database");
+                logger.atError().log("[RemoteAuth] - MainThread --o-o-- Error initializing messages, database and logs");
                 Bukkit.shutdown();
             }
         } else {
-            System.out.println("RemoteAuth --/ERROR/-- Plugin is disabled in the configuration file");
+            logger.atError().log("[RemoteAuth] - MainThread --o-o-- Database is not ready to connect");
+            Bukkit.shutdown();
         }
+        logger.atInfo().log("[RemoteAuth] - MainThread --o-o-- Messages, database and logs initialized");
 
-        /// Checks the spawn to see if it is set
-        try {
-            // Check if the spawn is set
-            spawnSet = getConfig().getBoolean("spawn.spawn_set");
-            logger.atInfo().log("Spawn set: {}", spawnSet);
-        } catch (Exception e) {
-            spawnSet = false;
-        }
-        /// If the spawn is set, load the spawn location
+        // Check whether the spawn is set or not
+        spawnSet = getConfig().getBoolean("spawn.spawn_set", false);
+
+        // If the spawn is set, load the spawn location
         if (spawnSet) {
             try {
                 setLocalSpawn(new Location(Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("spawn.world"))), getConfig().getInt("spawn.X"),
                         getConfig().getInt("spawn.Y"), getConfig().getInt("spawn.Z"),
                         Float.parseFloat(Objects.requireNonNull(getConfig().getString("spawn.yaw"))), (float) getConfig().getInt("spawn.pitch")));
-            } catch (NullPointerException e) {
-                System.out.println("Error loading spawn location from configuration file");
+                logger.atInfo().log("[RemoteAuth] - MainThread --o-o-- Spawn location loaded from configuration file. World: {}, X: {}, Y: {}, Z: {}, Yaw: {}, Pitch: {}",
+                        spawnWorld, spawnCoordinates[0], spawnCoordinates[1], spawnCoordinates[2], spawnAngles[1], spawnAngles[0]);
+            } catch (RuntimeException e) {
                 spawnSet = false;
+                logger.atError().log("[RemoteAuth] - MainThread --o-o-- Error loading spawn location from configuration file");
             }
         }
 
@@ -124,6 +123,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
         autoMessages.put("automatic_messages.alert.force_logout_30s", getConfig().getBoolean("automatic_messages.alert.force_logout_30s"));
         autoMessages.put("automatic_messages.alert.force_logout_15s", getConfig().getBoolean("automatic_messages.alert.force_logout_15s"));
         autoMessages.put("automatic_messages.alert.force_logout_5s", getConfig().getBoolean("automatic_messages.alert.force_logout_5s"));
+        logger.atInfo().log("[RemoteAuth] - MainThread --o-o-- Automatic messages loaded");
 
 
         // Register the commands
@@ -132,7 +132,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
             Objects.requireNonNull(getCommand("register")).setExecutor(new RegisterCommand(this));
             Objects.requireNonNull(getCommand("changepassword")).setExecutor(new ChangePasswordCommand());
             Objects.requireNonNull(getCommand("rasetspawn")).setExecutor(new AdminCommands(this));
+            logger.atInfo().log("[RemoteAuth] - MainThread --o-o-- Commands registered");
         } catch (NullPointerException e) {
+            logger.atError().log("[RemoteAuth] - MainThread --o-o-- Error initializing commands");
             Bukkit.shutdown();
             throw new RuntimeException("Error initializing commands");
         }
@@ -177,20 +179,15 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      * @param location The location to set as spawn
      */
     private void setConfigSpawn(Location location) throws NullPointerException {
-        try {
-            getConfig().options().copyDefaults();
-            getConfig().set("spawn.spawn_set", true);
-            getConfig().set("spawn.X", location.getBlockX());
-            getConfig().set("spawn.Y", location.getBlockY());
-            getConfig().set("spawn.Z", location.getBlockZ());
-            getConfig().set("spawn.yaw", location.getYaw());
-            getConfig().set("spawn.pitch", location.getPitch());
-            getConfig().set("spawn.world", Objects.requireNonNull(location.getWorld()).getName());
-        } catch (NullPointerException e) {
-            System.out.println("Error setting spawn location in configuration file");
-        } finally {
-            saveConfig();
-        }
+        getConfig().options().copyDefaults();
+        getConfig().set("spawn.spawn_set", true);
+        getConfig().set("spawn.X", location.getBlockX());
+        getConfig().set("spawn.Y", location.getBlockY());
+        getConfig().set("spawn.Z", location.getBlockZ());
+        getConfig().set("spawn.yaw", location.getYaw());
+        getConfig().set("spawn.pitch", location.getPitch());
+        getConfig().set("spawn.world", Objects.requireNonNull(location.getWorld()).getName());
+        saveConfig();
     }
 
     /**
@@ -201,25 +198,28 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     public void setSpawn(Location location) {
         setConfigSpawn(location);
         setLocalSpawn(location);
+        logger.atInfo().log("[RemoteAuth] - MainThread --o-o-- Spawn location set. World: {}, X: {}, Y: {}, Z: {}, Yaw: {}, Pitch: {}",
+                spawnWorld, spawnCoordinates[0], spawnCoordinates[1], spawnCoordinates[2], spawnAngles[1], spawnAngles[0]);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if(autoMessages.get("automatic_messages.alert.force_logout_5s")) {
+        logger.atInfo().log("[RemoteAuth] - Events --o-o-- Player {} joined the server", e.getPlayer().getName());
+        if (autoMessages.get("automatic_messages.alert.force_logout_5s")) {
             BukkitTask taskPreKicking2 = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
                     .addParameter(Parameters.TIME, "5")
                     .build())), 500);
             addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking2, true));
         }
 
-        if(autoMessages.get("automatic_messages.alert.force_logout_15s")) {
+        if (autoMessages.get("automatic_messages.alert.force_logout_15s")) {
             BukkitTask taskPreKicking = Bukkit.getScheduler().runTaskLater(this, () -> e.getPlayer().sendMessage(Settings.getMessage(DefaultMessages.PRE_LOGIN_TIME_OUT_ALERT, ParameterBuilder.create()
                     .addParameter(Parameters.TIME, "15")
                     .build())), 300);
             addTask(e.getPlayer().getUniqueId(), new Task(taskPreKicking, true));
         }
 
-        if(autoMessages.get("automatic_messages.alert.force_logout_30s")) {
+        if (autoMessages.get("automatic_messages.alert.force_logout_30s")) {
             BukkitTask taskKickIfNotLoggedIn = Bukkit.getScheduler().runTaskLater(this, () -> {
                 if (!isPlayerLogged(e.getPlayer().getUniqueId())) {
                     e.getPlayer().kickPlayer(Settings.getMessage(DefaultMessages.LOGIN_TIME_OUT_ALERT));
@@ -244,7 +244,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
             }
         } catch (Exception ex) {
             Objects.requireNonNull(Bukkit.getPlayer(e.getPlayer().getUniqueId())).kickPlayer(Settings.getMessage(DefaultMessages.CRITICAL_ISREGISTERED_ERROR));
-            System.out.println("RemoteAuth --/ERROR/-- Error checking if " + e.getPlayer().getName() + " was registered - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("[RemoteAuth] - Events --o-o-- Error checking if the player is registered. Player: {}", e.getPlayer().getName());
         }
     }
 
@@ -300,6 +300,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         // Remove the player from the active sessions map
         activeSessions.remove(event.getPlayer().getUniqueId());
+        logger.atInfo().log("[RemoteAuth] - Events --o-o-- Player {} left the server", event.getPlayer().getName());
     }
 
     @EventHandler
@@ -316,6 +317,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     /**
      * <p>Method used to check if the player is logged in.</p>
+     *
      * @param playerUUID The player's UUID
      * @return If the player is logged in
      */
@@ -325,8 +327,9 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     /**
      * <p>Method used to add a task to the player's login tasks.</p>
+     *
      * @param playerUUID The player's UUID
-     * @param task The new task to add
+     * @param task       The new task to add
      */
     public void addTask(UUID playerUUID, Task task) {
         taskMap.computeIfAbsent(playerUUID, k -> new ArrayList<>());
@@ -335,6 +338,7 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
 
     /**
      * <p>Method used to clear all the player's login tasks.</p>
+     *
      * @param playerUUID The player's UUID
      */
     public void clearLoginTasks(UUID playerUUID) {
@@ -352,7 +356,8 @@ public final class RemoteAuth extends JavaPlugin implements Listener {
      *     <li>Clears the player's login tasks</li>
      *     <li>Adds the player to the active sessions map</li>
      * </ul>
-     * @param playerUUID The player's UUID
+     *
+     * @param playerUUID   The player's UUID
      * @param sessionModel The session model
      */
     public void doPostLogin(UUID playerUUID, SessionModel sessionModel) {

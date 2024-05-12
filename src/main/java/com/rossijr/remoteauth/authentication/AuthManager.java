@@ -39,19 +39,18 @@ public class AuthManager {
      * @return UserModel object if the user was successfully authenticated, null otherwise
      */
     public static UserModel login(UUID uuid, String password) {
-        logger.atInfo().log("User {} is trying to login", uuid);
         password = hashString(password); // Hash the password
         try {
             UserModel userModel = userDao.getById(UserModel.class, uuid);
             // Check if the user exists and the password is correct
             if (userModel != null && userModel.getPassword().equals(password)) {
-                logger.atInfo().log("User {} successfully logged in", uuid);
+                logger.atInfo().log("[RemoteAuth] - LoginThread --o-o-- User {} successfully logged in", uuid);
                 return userModel;
             }
         } catch (Exception e) {
-            logger.atError().log("Error during login. User: {}", uuid);
+            logger.atError().log("[RemoteAuth] - LoginThread --o-o-- Error during login. User: {}", uuid);
         }
-        logger.atInfo().log("User {} failed to login", uuid);
+        logger.atWarn().log("[RemoteAuth] - LoginThread --o-o-- User {} failed to login", uuid);
         return null;
     }
 
@@ -61,18 +60,17 @@ public class AuthManager {
      * @return true if the user was successfully registered, false otherwise
      */
     public static boolean register(UserModel userModel) {
-        logger.atInfo().log("User {} is trying to register", userModel.getUuid());
         try {
             userModel.setPassword(hashString(userModel.getPassword()));
             if(userDao.save(userModel) != null){
-                logger.atInfo().log("User {} successfully registered", userModel.getUuid());
+                logger.atInfo().log("[RemoteAuth] - RegisterThread --o-o-- User {} successfully registered", userModel.getUuid());
                 return true;
             } else {
-                logger.atError().log("User {} didn't registered successfully", userModel.getUuid());
+                logger.atWarn().log("[RemoteAuth] - RegisterThread --o-o-- User {} didn't registered successfully", userModel.getUuid());
                 return false;
             }
         } catch (Exception e) {
-            logger.atError().log("Error during register. User: {}", userModel.getUuid());
+            logger.atError().log("[RemoteAuth] - RegisterThread --o-o-- Error during register. User: {}", userModel.getUuid());
             return false;
         }
     }
@@ -87,7 +85,7 @@ public class AuthManager {
         try {
             return userDao.getById(UserModel.class, uuid) != null;
         } catch (Exception e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error during uuidExists - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("[RemoteAuth] - SecondaryThreads --o-o-- Error during UUID check. UUID: {}", uuid);
         }
         return false;
     }
@@ -111,19 +109,18 @@ public class AuthManager {
      * @return true if the password was successfully changed, false otherwise
      */
     public static boolean changePassword(UUID uuid, String password) {
-        logger.atInfo().log("User {} is trying to change password", uuid);
         try {
             UserModel userModel = userDao.getById(UserModel.class, uuid);
             userModel.setPassword(hashString(password));
             if (userDao.update(userModel) != null) {
-                logger.atInfo().log("User {} successfully changed password", uuid);
+                logger.atInfo().log("[RemoteAuth] - PasswdChangeThread --o-o-- User {} successfully changed password", uuid);
                 return true;
             } else {
-                logger.atError().log("User {} didn't change password successfully", uuid);
+                logger.atWarn().log("[RemoteAuth] - PasswdChangeThread --o-o-- User {} didn't change password successfully", uuid);
                 return false;
             }
         } catch (Exception e) {
-            logger.atError().log("Error during change password. User: {}", uuid);
+            logger.atError().log("[RemoteAuth] - PasswdChangeThread --o-o-- Error during change password. User: {}", uuid);
             return false;
         }
     }
@@ -134,7 +131,7 @@ public class AuthManager {
      * @return UserModel object if the user exists, null otherwise
      */
     public static UserModel getUserByUsername(String username) {
-        logger.atInfo().log("Searching for user with username \"{}\"", username);
+        logger.atInfo().log("[RemoteAuth] - SecondaryThreads --o-o-- Searching for user with username \"{}\"", username);
         return (UserModel) userDao.getByColumn(UserModel.class, "username", username).stream().findFirst().orElse(null);
     }
 
@@ -160,9 +157,8 @@ public class AuthManager {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("RemoteAuth --/ERROR/-- Error during hashing - class {" + AuthManager.class.getName() + "}");
+            logger.atError().log("RA - SecondaryThreads --o-o-- Error during hashing");
             return null;
-
         }
     }
 }

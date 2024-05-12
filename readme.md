@@ -58,7 +58,7 @@ single server.
 
 - [x] PostgresSQL
 - [x] MySQL 
-- [x] SQL Server
+- [ ] SQL Server (**Bug with the driver**)
 - [x] SQLite
 - [x] Oracle
 - [ ] MariaDB **(NOT IMPLEMENTED YET)**
