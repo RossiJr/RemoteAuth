@@ -3,6 +3,7 @@ package com.rossijr.remoteauth.authentication;
 import com.rossijr.remoteauth.authentication.models.UserModel;
 import com.rossijr.remoteauth.db.GenericDAO;
 import com.rossijr.remoteauth.db.GenericDAOI;
+import com.rossijr.remoteauth.db.exceptions.DatabaseNotSupportedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,8 @@ public class AuthManager {
 
     /**
      * Authenticate the user in the database with the provided UUID and password
-     * @param uuid UUID of the user
+     *
+     * @param uuid     UUID of the user
      * @param password password of the user
      * @return UserModel object if the user was successfully authenticated, null otherwise
      */
@@ -56,13 +58,14 @@ public class AuthManager {
 
     /**
      * Register a new user in the database. Refactored using the GenericDAO class.
+     *
      * @param userModel UserModel object to be registered (represents the player)
      * @return true if the user was successfully registered, false otherwise
      */
     public static boolean register(UserModel userModel) {
         try {
             userModel.setPassword(hashString(userModel.getPassword()));
-            if(userDao.save(userModel) != null){
+            if (userDao.save(userModel) != null) {
                 logger.atInfo().log("[RemoteAuth] - RegisterThread --o-o-- User {} successfully registered", userModel.getUuid());
                 return true;
             } else {
@@ -127,6 +130,7 @@ public class AuthManager {
 
     /**
      * Get a user by its username
+     *
      * @param username username to be queried
      * @return UserModel object if the user exists, null otherwise
      */
@@ -138,6 +142,7 @@ public class AuthManager {
 
     /**
      * Hashes a string using the SHA-256 algorithm
+     *
      * @param string string to be hashed
      * @return hashed string
      */

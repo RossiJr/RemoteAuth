@@ -48,6 +48,23 @@
                     <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-maven-plugin</artifactId>
+                <version>6.0.0-release</version>
+                <configuration>
+                    <metadataDirectory>${project.build.outputDirectory}</metadataDirectory>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -102,6 +119,29 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.45.3.0</version>
+        </dependency>
+
+
+
+        <!-- https://mvnrepository.com/artifact/org.datanucleus/javax.jdo -->
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>javax.jdo</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.datanucleus/datanucleus-accessplatform-jdo-mongodb -->
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-accessplatform-jdo-mongodb</artifactId>
+            <version>6.0.7</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.12.9</version>
         </dependency>
 
 

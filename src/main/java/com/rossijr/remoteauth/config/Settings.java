@@ -59,7 +59,10 @@ public class Settings {
 
     private static Properties loadBdConfigurations(FileConfiguration configuration) throws NullPointerException {
         Properties properties = new Properties();
+        String dbType = configuration.getString("db.type", "sql");
+        properties.setProperty("db.type", dbType);
 
+        if(dbType.equals("sql")) {
             properties.setProperty(Environment.JAKARTA_JDBC_DRIVER, getDatabaseDriver((Objects.requireNonNull(configuration.getString("db.dbms")))));
             properties.setProperty(Environment.JAKARTA_JDBC_URL, "jdbc:" +
                     configuration.getString("db.dbms") + "://" + configuration.getString("db.host") +
@@ -67,6 +70,13 @@ public class Settings {
             properties.setProperty(Environment.JAKARTA_JDBC_USER, configuration.getString("db.username"));
             properties.setProperty(Environment.JAKARTA_JDBC_PASSWORD, configuration.getString("db.password"));
             properties.setProperty(Environment.DIALECT, getDatabaseDialect((Objects.requireNonNull(configuration.getString("db.dbms")))));
+        } else if (dbType.equals("nosql")){
+            properties.setProperty("javax.jdo.option.ConnectionURL", configuration.getString("db.dbms") + "://" + configuration.getString("db.host") + ":" + configuration.getString("db.port") + "/" + configuration.getString("db.database"));
+            properties.setProperty("javax.jdo.option.Mapping", configuration.getString("db.dbms"));
+            properties.setProperty("javax.jdo.option.ConnectionUserName", configuration.getString("db.username"));
+            properties.setProperty("javax.jdo.option.ConnectionPassword", configuration.getString("db.password"));
+            properties.setProperty("datanucleus.metadata.allowLoadAtRuntime", "true");
+        }
         Settings.dbProperties = properties;
         return properties;
     }

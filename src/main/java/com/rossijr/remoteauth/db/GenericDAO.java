@@ -1,13 +1,29 @@
 package com.rossijr.remoteauth.db;
 
-import jakarta.persistence.Query;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.rossijr.remoteauth.db.exceptions.DatabaseNotSupportedException;
 
 import java.util.List;
 
 public class GenericDAO<T> implements GenericDAOI<T> {
+    private final String databaseType;
+    private final GenericDAOI<T> dao;
+
+    /**
+     * Constructor to initialize the database type and the DAO.
+     * It is empty because the database type is already defined in the configuration file.
+     */
+    public GenericDAO(){
+        this.databaseType = Configuration.getDatabaseType();
+        if(databaseType.equals("sql")){
+            dao = new SQLDao<>();
+        } else if(databaseType.equals("nosql")){
+            dao = new NoSQLDao<>();
+        } else {
+            throw new DatabaseNotSupportedException("Database type not supported: " + databaseType);
+        }
+    }
+
+
     /**
      * <p>Save an object in the database</p>
      * @param entity object to be saved
@@ -15,17 +31,7 @@ public class GenericDAO<T> implements GenericDAOI<T> {
      */
     @Override
     public T save(T entity) {
-        try (Session session = Configuration.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            session.persist(entity);
-            transaction.commit();
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error during persist operation - Hibernate", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return entity;
+        return dao.save(entity);
     }
 
     /**
@@ -35,17 +41,7 @@ public class GenericDAO<T> implements GenericDAOI<T> {
      */
     @Override
     public T update(T entity) {
-        try (Session session = Configuration.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            T newObj = session.merge(entity);
-            transaction.commit();
-            return newObj;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error during update operation - Hibernate", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return dao.update(entity);
     }
 
     /**
@@ -55,15 +51,7 @@ public class GenericDAO<T> implements GenericDAOI<T> {
      */
     @Override
     public boolean delete(T entity) {
-        try (Session session = Configuration.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            session.remove(entity);
-            transaction.commit();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return dao.delete(entity);
     }
 
     /**
@@ -74,15 +62,7 @@ public class GenericDAO<T> implements GenericDAOI<T> {
      */
     @Override
     public T getById(Class<T> clazz, Object id) {
-        try (Session session = Configuration.getSessionFactory().openSession()) {
-            T obj = session.get(clazz, id);
-            return obj;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error during select by id operation - Hibernate", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return dao.getById(clazz, id);
     }
 
     /**
@@ -95,15 +75,6 @@ public class GenericDAO<T> implements GenericDAOI<T> {
      */
     @Override
     public List getByColumn(Class<T> clazz, String column, String value) {
-        try (Session session = Configuration.getSessionFactory().openSession()) {
-            Query query = session.createQuery("from " + clazz.getName() + " where " + column + " = :value", clazz);
-            query.setParameter("value", value);
-            return query.getResultList();
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error during select by column operation - Hibernate", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return dao.getByColumn(clazz, column, value);
     }
 }

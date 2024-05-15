@@ -7,5 +7,5 @@ public interface GenericDAOI<T> {
     T update(T entity);
     boolean delete(T entity);
     T getById(Class<T> clazz, Object id);
-    List getByColumn(Class<T> clazz, String column, String value);
+    List<T> getByColumn(Class<T> clazz, String column, String value);
 }

@@ -3,24 +3,32 @@ package com.rossijr.remoteauth.authentication.models;
 
 import jakarta.persistence.*;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PrimaryKey;
 import java.util.UUID;
 
 /**
  * UserModel class to represent the user in the database and in the application
  */
-@Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "uuid"),})
+
+@PersistenceCapable(detachable = "true", table = "Authentication")
+//@Entity
+//@Table(name = "users", uniqueConstraints = {
+//        @UniqueConstraint(columnNames = "uuid"),})
 public class UserModel {
-    @Id
-    @Column(name = "uuid", unique = true, nullable = false)
+//    @Id
+    @PrimaryKey
+//    @Column(name = "uuid", unique = true, nullable = false)
+    @javax.jdo.annotations.Column(name = "_id", allowsNull = "false")
     private UUID uuid;
-    @Column(name = "username", unique = true, nullable = false)
+//    @Column(name = "username", unique = true, nullable = false)
+    @javax.jdo.annotations.Column(name = "username", allowsNull = "false")
     private String username;
-    @Column(name = "password", nullable = false)
+//    @Column(name = "password", nullable = false)
+    @javax.jdo.annotations.Column(name = "password", allowsNull = "false")
     private String password;
 
-    public UserModel(){
+    public UserModel() {
     }
 
 

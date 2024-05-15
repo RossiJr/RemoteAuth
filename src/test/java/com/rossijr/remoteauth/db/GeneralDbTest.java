@@ -9,8 +9,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
+import javax.jdo.JDOHelper;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -28,6 +31,16 @@ public class GeneralDbTest {
         properties.setProperty(Environment.JAKARTA_JDBC_PASSWORD, "");
         properties.setProperty(Environment.JAKARTA_HBM2DDL_DB_NAME, "create-drop");
         properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+        return properties;
+    }
+
+    private static Properties defineNoSQLDatabaseParameters(){
+        Properties properties = new Properties();
+        properties.setProperty("db.type", "nosql");
+        properties.setProperty("javax.jdo.option.ConnectionURL", "mongodb://localhost:27017/RemoteAuth");
+        properties.setProperty("javax.jdo.option.Mapping", "mongodb");
+        properties.setProperty("datanucleus.metadata.allowLoadAtRuntime", "true");
+        properties.setProperty("datanucleus.autoCreateSchema", "true");
         return properties;
     }
 
@@ -133,5 +146,27 @@ public class GeneralDbTest {
         logger.atInfo().log("Testing get user by username with non-existing user");
         assertNull(AuthManager.getUserByUsername("user9"));
         logger.atInfo().log("Get user by username test passed");
+    }
+
+    @Test
+    public void testNoSQLDatabase() {
+        logger.atInfo().log("Setting up NoSQL database");
+        Configuration.setPmf(JDOHelper.getPersistenceManagerFactory(defineNoSQLDatabaseParameters()));
+        NoSQLDao<UserModel> newDao = new NoSQLDao<>();
+        logger.atInfo().log("NoSQL database set up");
+
+        logger.atInfo().log("Testing NoSQL database");
+        UserModel newUser = new UserModel(UUID.randomUUID(), "user9", "password9");
+        UserModel newUser2 = new UserModel(UUID.randomUUID(), "user10", "password10");
+
+        logger.atInfo().log("Saving new users");
+        assertEquals(newUser.getUuid(), newDao.save(newUser).getUuid());
+        assertEquals(newUser2.getUuid(), newDao.save(newUser2).getUuid());
+        logger.atInfo().log("Users saved");
+
+        logger.atInfo().log("Testing get by column");
+        assertEquals(1, newDao.getByColumn(UserModel.class, "username", "user9").size());
+        assertEquals(1, newDao.getByColumn(UserModel.class, "username", "user10").size());
+        logger.atInfo().log("Get by column test passed");
     }
 }
